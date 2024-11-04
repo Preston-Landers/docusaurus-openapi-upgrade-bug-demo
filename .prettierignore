@@ -1,0 +1,6 @@
+.yarn
+node_modules
+
+# This stuff is auto-generated with the `yarn api-docs` command (part of `yarn build`)
+content/docs/reference
+static/journyx_openapi.yaml

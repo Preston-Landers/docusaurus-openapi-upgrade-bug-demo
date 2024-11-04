@@ -1,0 +1,15 @@
+components:
+  schemas:
+    DomainFields:
+      type: object
+      description: |
+        These are fields related to the deprecated "Domain" object.
+      properties:
+        id_domain:
+          type: string
+          # format: uuid
+          description: |
+            The internal Domain ID of the resource or object.
+            In general, this field is deprecated and not in use and can be ignored.
+          example: "install_root_dom"
+          readOnly: true

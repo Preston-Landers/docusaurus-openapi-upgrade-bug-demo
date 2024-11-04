@@ -1,0 +1,143 @@
+# The example is duplicated here because we want an example to appear
+# on the Schema page, and not just a dedicated example for a specific implementation,
+# e.g. a Users response.
+components:
+  schemas:
+    CustomFields:
+      type: object
+      description: |
+        Custom fields are used to store additional information about a resource.
+        The fields are defined by the system administrators and can be of various
+        data types.
+
+        This page describes the schema for custom field values as shown in
+        the response of a resource that has custom fields. There is an expanded
+        schema for the custom field definitions at their own endpoint, as
+        shown in the `id_attr_type_uri` field.
+
+        :::tip
+
+        The `custom_fields` object will only be included in the response if requested
+        in `$keys`; see details below.
+
+        :::
+
+        ### Editing Custom Fields
+
+        In general, to update Custom Field values for an object, when submitting
+        a `PUT` request to update the object, you can include the `custom_fields`
+        object in the request body. The `custom_fields` object should follow
+        the basic schema shown here, but only needs to include the `value` field
+        for each custom field you want to update. For example, this is enough
+        to update two custom fields:
+
+        ```json
+        {
+          "custom_fields": {
+            "C41B2DDA662F4EF6B730F9CB6DB04696": {
+              "value": "New Value"
+            },
+            "users_email": {
+              "value": "new_email@example.com"
+            }
+        }
+        ```
+
+        Any custom fields not included in the `custom_fields` object will not be
+        updated and will retain their current values. You can set the `null` value
+
+        ### Viewability
+
+        It's also important to note that Custom Fields are subject to
+        viewability restrictions based on the "Reportability" property set by
+        system administrators.
+
+        :::tip
+
+        Please note that access to view custom fields are automatically filtered by
+        "Reportability", a property set by admins on the custom field definition that
+        determines which User Roles are allowed to see the field. If you are not seeing
+        a custom field that you expect to see, please check with your system administrator.
+
+        :::
+
+        ### Examples
+
+        Here's an example value of `custom_fields` in a response:
+
+        ```json
+        "custom_fields": {
+          "C41B2DDA662F4EF6B730F9CB6DB04696": {
+            "attr_type": "ENUM_STRING_252",
+            "description": "Employee pay group.",
+            "id_attr_type": "C41B2DDA662F4EF6B730F9CB6DB04696",
+            "id_attr_type_uri": "/api/v1/custom_fields/C41B2DDA662F4EF6B730F9CB6DB04696",
+            "pname": "Pay Group",
+            "value": "XYZ Pay Group"
+          },
+          "users_email": {
+            "attr_type": "STRING_252",
+            "description": "Email address",
+            "id_attr_type": "users_email",
+            "id_attr_type_uri": "/api/v1/custom_fields/users_email",
+            "pname": "Email Address",
+            "value": "username@example.com"
+          }
+
+        ```
+
+        Note that there is an alternate representation available in most object types, where
+        each custom field value is a separate key in the main object (not under `custom_fields`)
+        in the following format, showing both a singular and multi-value example:
+
+        ```json
+        "users_attribs:C41B2DDA662F4EF6B730F9CB6DB04696": "XYZ Pay Group",
+        "users_attribs:users_skills": [
+          "CRM admin - advanced"
+        ]
+        ```
+
+        This follows the pattern of `users_attribs:<field_id>`, where `users_attribs` is
+        the internal table name for User custom fields. For other object types, the table
+        name will be different, e.g. `projects_attribs`. This is a read-only representation
+        for convenience and is not used for updating custom fields.
+
+        This more compact representation is always provided (unless `$keys=$base` was set).
+        However, the `custom_fields` object will only be available if `$keys=custom_fields`
+        or `$keys=$extended` was set.
+
+      properties:
+        custom_fields:
+          type: object
+          # nullable: true
+          # https://swagger.io/docs/specification/v3_0/data-models/dictionaries/
+          # additionalProperties:
+          #   $ref: "../collections/custom_fields/custom_field.yaml#/CustomFieldValue"
+          # Should we update this link to a general concepts / tutorial page on custom fields?
+          description: |
+            A map of custom fields. The key is the field ID and the value a description
+            of the field.
+
+            Important: this will only be included in the response if `$keys=custom_fields`
+            or `$keys=$extended` was set as a query parameter.
+
+            There is also a more compact representation available in most object types, where
+            each custom field value is a separate key in the main object (not under `custom_fields`).
+
+            See the [CustomFields](/docs/reference/schemas/customfields) schema page for
+            more information on these topics.
+          example:
+            C41B2DDA662F4EF6B730F9CB6DB04696:
+              "attr_type": "ENUM_STRING_252"
+              "description": "Employee pay group."
+              "id_attr_type": "C41B2DDA662F4EF6B730F9CB6DB04696"
+              "id_attr_type_uri": "/api/v1/custom_fields/C41B2DDA662F4EF6B730F9CB6DB04696"
+              "pname": "Pay Group"
+              "value": "XYZ Pay Group"
+            users_email:
+              "attr_type": "STRING_252"
+              "description": "Email address"
+              "id_attr_type": "users_email"
+              "id_attr_type_uri": "/api/v1/custom_fields/users_email"
+              "pname": "Email Address"
+              "value": "username@example.com"

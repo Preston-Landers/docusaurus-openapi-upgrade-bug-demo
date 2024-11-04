@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "davidanson.vscode-markdownlint",
+    "yzhang.markdown-all-in-one",
+    "esbenp.prettier-vscode",
+    "streetsidesoftware.code-spell-checker",
+    "redhat.vscode-yaml",
+    "42crunch.vscode-openapi",
+    "dbaeumer.vscode-eslint",
+    "unifiedjs.vscode-mdx"
+  ]
+}

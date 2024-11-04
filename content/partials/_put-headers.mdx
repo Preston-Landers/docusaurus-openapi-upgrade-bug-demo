@@ -1,0 +1,6 @@
+As with all `PUT` modifications, you
+must include the `If-Match` header
+with the current `ETag` value of the user record or the request will fail with a
+"412 Precondition Failed" status code. The ETag value can be obtained by
+retrieving the item with a `GET` request and examining the `ETag` header in the
+response.

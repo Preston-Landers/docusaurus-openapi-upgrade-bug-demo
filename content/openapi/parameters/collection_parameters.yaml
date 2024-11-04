@@ -1,0 +1,96 @@
+components:
+  parameters:
+    "$top":
+      name: $top
+      in: query
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        minimum: 1
+        default: 100
+      description: |
+        The maximum number of objects to return. The default may vary from
+        endpoint to endpoint, but is typically 100.
+      example: 10
+
+    "$skip":
+      name: $skip
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: |
+        The number of objects to skip before returning results.
+      example: 0
+
+    "$orderBy":
+      name: $orderBy
+      in: query
+      required: false
+      schema:
+        type: string
+        default: pname asc
+      description: |
+        The field to sort by, optionally followed by a space and the sort direction. If this
+        parameter is not given, the default sort field is typically `pname` if available. Specify
+        additional secondary sort fields by separating them with commas. This field is not
+        case-sensitive.
+
+        The sort direction can be `asc` (ascending) or `desc` (descending).
+
+        If not specified, the default sort direction is usually ascending.
+
+        This parameter can be repeated to sort by multiple fields, or you
+        can comma-separate multiple fields in a single parameter.
+
+        <ins>Important:</ins> not all fields are sortable. If you attempt to
+        sort by a non-sortable field, the API will return an 400 Bad Request
+        error.
+      example: creator.fullname desc, pname asc
+
+    "$keys":
+      name: $keys
+      in: query
+      required: false
+      schema:
+        type: string
+      description: |
+        Specifies which keys (data values) to include in objects in the response. If this
+        parameter is not given, typically most keys are included unless they are
+        expensive to compute or return.
+
+        This parameter can be repeated to request multiple keys.
+
+        Any regular field can be named here, though many are automatically
+        included by default and don't need to be specified.
+
+        Special values are:
+        - `$base` - only include the base object fields, which is usually much faster.
+          Note that if `$base` is specified, no other keys will be included even if
+          they are specified here.
+        - `$extended` - include all extended properties, such as custom fields.
+
+      example: creator_properties.fullname
+
+    "$filter":
+      name: $filter
+      in: query
+      required: false
+      schema:
+        type: string
+      description: |
+        A filter specification string.
+
+        See the [Collections#Filtering](/docs/collections#filtering) page for more
+        information.
+
+        <ins>Important:</ins> all string literals must be JSON-encoded; for
+        example, a string literal must be enclosed in double quotes (`"`) and
+        any double quotes within the string must be escaped with a backslash
+        (`\"`), as shown in the example.
+
+      # TODO: better examples
+      example: pname eq "Embedded \" Quote Project"

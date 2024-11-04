@@ -1,0 +1,76 @@
+{
+  "name": "jx-api-docs",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "docusaurus": "docusaurus",
+    "start": "docusaurus start",
+    "build": "yarn build-api && yarn build-docs",
+    "build-api": "yarn openapi-lint && yarn clean-api-docs && yarn openapi-build && yarn api-docs",
+    "build-docs": "docusaurus build",
+    "swizzle": "docusaurus swizzle",
+    "deploy": "docusaurus deploy",
+    "clear": "docusaurus clear",
+    "serve": "docusaurus serve",
+    "write-translations": "docusaurus write-translations",
+    "write-heading-ids": "docusaurus write-heading-ids",
+    "typecheck": "tsc",
+    "api-docs": "yarn docusaurus gen-api-docs all",
+    "clean-api-docs": "docusaurus clean-api-docs all",
+    "openapi-lint": "redocly lint content/openapi/journyx_openapi.yaml",
+    "openapi-build": "redocly bundle content/openapi/journyx_openapi.yaml -o static/journyx_openapi.yaml",
+    "openapi-start": "redocly preview-docs content/openapi/journyx_openapi",
+    "format": "prettier --write .",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "@docusaurus/core": "3.5.2",
+    "@docusaurus/plugin-client-redirects": "3.5.2",
+    "@docusaurus/preset-classic": "3.5.2",
+    "@easyops-cn/docusaurus-search-local": "0.45.0",
+    "@mdx-js/react": "3.1.0",
+    "clsx": "2.1.1",
+    "docusaurus-plugin-openapi-docs": "4.1.0",
+    "docusaurus-theme-openapi-docs": "4.1.0",
+    "prism-react-renderer": "2.4.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "redocusaurus": "2.1.2"
+  },
+  "devDependencies": {
+    "@docusaurus/eslint-plugin": "3.5.2",
+    "@docusaurus/module-type-aliases": "3.5.2",
+    "@docusaurus/tsconfig": "3.5.2",
+    "@docusaurus/types": "3.5.2",
+    "@eslint/js": "9.14.0",
+    "@redocly/cli": "1.25.10",
+    "@types/eslint__js": "8.42.3",
+    "@types/node": "22.8.6",
+    "eslint": "9.14.0",
+    "eslint-config-prettier": "9.1.0",
+    "eslint-plugin-prettier": "5.2.1",
+    "eslint-plugin-react": "7.37.2",
+    "husky": "9.1.6",
+    "lint-staged": "15.2.10",
+    "markdownlint": "0.36.1",
+    "markdownlint-cli2": "0.14.0",
+    "prettier": "3.3.3",
+    "typescript": "5.6.3",
+    "typescript-eslint": "8.12.2"
+  },
+  "browserslist": {
+    "production": [
+      ">0.5%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 3 chrome version",
+      "last 3 firefox version",
+      "last 5 safari version"
+    ]
+  },
+  "engines": {
+    "node": ">=18.0"
+  }
+}

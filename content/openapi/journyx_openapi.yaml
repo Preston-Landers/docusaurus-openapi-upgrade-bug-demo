@@ -1,0 +1,71 @@
+# This is the master entry point for the OpenAPI specification for JX.
+# Most collections, resources, and other components should be defined
+# in separate files and referenced here.
+
+openapi: 3.0.0
+
+info:
+  title: Journyx REST API
+  description: |
+    Welcome to the API Reference section of the Journyx JX / PX technical
+    documentation.
+
+    Before diving into the API Reference, make sure you have reviewed
+    the [Introduction](/docs/intro) and Core Concepts
+    sections as these contain essential background information.
+
+    :::info Review the Collections page
+
+    A key part of using the Journyx API is understanding the
+    Collections concept. Collections are groups of similar
+    objects, such as users, projects, or time entries, and they have common
+    endpoints and behaviors relating to selecting fields, filtering, sorting,
+    and pagination. These features are explained in detail on the
+    Collections page.
+
+    :::
+
+  version: 0.0.1
+  license:
+    name: Commercial License
+    # TODO: this is NOT the correct URL; must be updated!
+    url: https://journyx.com/wp-content/uploads/2023/08/termsofuse.pdf
+
+# https://swagger.io/docs/specification/components/
+components:
+  securitySchemes:
+    # Cookie-based auth (wtsession)
+    # https://swagger.io/docs/specification/v3_0/authentication/cookie-authentication/#describing-cookie-authentication
+    wtsession:
+      description: |
+        Authentication is described in more detail in the dedicated
+        Authentication section of the documentation.
+
+
+      type: apiKey
+      in: cookie
+      name: wtsession
+    http-basic:
+      description: |
+        HTTP Basic Authentication; this authenticates each request separately
+        with a username and either a password or an API Key. This is less performant
+        than using a `wtsession` cookie, so we recommend using the `wtsession`
+        cookie instead. However, HTTP Basic Auth is often useful for testing
+        and for simple scripts.
+
+        Please see the Authentication section for
+        complete details.
+      type: http
+      scheme: basic
+
+security:
+  - wtsession: []
+  - http-basic: []
+servers:
+  - url: https://example.apps.journyx.com/api/v1
+
+paths:
+  /users:
+    $ref: "./collections/users/user_paths.yaml#/user-collection"
+  /users/{userId}:
+    $ref: "./collections/users/user_paths.yaml#/user-item"

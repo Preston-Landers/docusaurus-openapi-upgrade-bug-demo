@@ -1,0 +1,235 @@
+# Path /users
+
+components:
+  parameters:
+    userId:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: |
+        The internal ID of the user to retrieve or modify.
+      example: 64BBA147B9AC41D9978062300826C89F
+
+user-collection:
+  get:
+    summary: List users
+    description: |
+      Retrieve a list of users in the system.
+    operationId: list-users
+    parameters:
+      - $ref: "../../parameters/collection_parameters.yaml#/components/parameters/$top"
+      - $ref: "../../parameters/collection_parameters.yaml#/components/parameters/$skip"
+      - $ref: "../../parameters/collection_parameters.yaml#/components/parameters/$keys"
+      - $ref: "../../parameters/collection_parameters.yaml#/components/parameters/$filter"
+      - $ref: "../../parameters/collection_parameters.yaml#/components/parameters/$orderBy"
+    responses:
+      "200":
+        description:
+          $ref: "../../schemas/paged_response_schema.yaml#/ResultsDesc/description"
+        content:
+          application/json:
+            schema:
+              $ref: "./users_collection.yaml#/UserCollectionResponse"
+      # Note: I don't love having to repeat this block of common responses
+      # across many different endpoints but I have not yet found a
+      # solution for doing this DRY that does not run into bugs or problems
+      # compiling the OpenAPI stuff into MDX (`yarn docusaurus gen-api-docs all`)
+      # So for now, just copy and paste the following responses where needed.
+      "400":
+        $ref: "../../errors/common_errors.yaml#/BadRequest"
+      "401":
+        $ref: "../../errors/common_errors.yaml#/NotAuthenticated"
+      "403":
+        $ref: "../../errors/common_errors.yaml#/NotAuthorized"
+      "404":
+        $ref: "../../errors/common_errors.yaml#/NotFound"
+      "500":
+        $ref: "../../errors/common_errors.yaml#/InternalServerError"
+      "503":
+        $ref: "../../errors/common_errors.yaml#/ServiceUnavailable"
+  post:
+    summary: Create a user
+    description: |
+      Add a new user to the system.
+
+      :::info Required abilities
+
+      This operation requires the `User - Add` ability, or
+      `Authority - Administrator`.
+
+      :::
+
+    operationId: create-user
+    x-required-abilities:
+      - User - Add
+    requestBody:
+      required: true
+      description:
+        $ref: "./user_mod.yaml#/components/schemas/UserModifiableFields/description"
+      content:
+        application/json:
+          schema:
+            # A separate schema that is specific to creating or modifying.
+            # Many of the fields in the full record are read-only
+            $ref: "./user_mod.yaml#/components/schemas/UserModifiableFields"
+    parameters:
+      - $ref: "../../parameters/request_headers.yaml#/components/parameters/ContentTypeHeader"
+      - $ref: "../../parameters/request_headers.yaml#/components/parameters/XRequestedWithHeader"
+      - $ref: "../../parameters/request_headers.yaml#/components/parameters/OriginHeader"
+    responses:
+      "201":
+        description:
+          $ref: "../../schemas/create_item_response_schema.yaml#/CreateItemResponse/description"
+        content:
+          application/json:
+            schema:
+              $ref: "../../schemas/create_item_response_schema.yaml#/CreateItemResponse"
+        headers:
+          $ref: "../../headers/create_item_headers.yaml#/CreateItemHeaders"
+          # Demonstrates how to add an additional header not part of CreateItemHeaders
+          # "X-Foo":
+          #   description: |
+          #     A custom header that is not part of the standard response.
+          #   schema:
+          #     type: string
+      "400":
+        $ref: "../../errors/common_errors.yaml#/BadRequest"
+      "401":
+        $ref: "../../errors/common_errors.yaml#/NotAuthenticated"
+      "403":
+        $ref: "../../errors/common_errors.yaml#/NotAuthorized"
+      "404":
+        $ref: "../../errors/common_errors.yaml#/NotFound"
+      "500":
+        $ref: "../../errors/common_errors.yaml#/InternalServerError"
+      "503":
+        $ref: "../../errors/common_errors.yaml#/ServiceUnavailable"
+
+# Path /users/{userId}
+user-item:
+  get:
+    summary: Get user by ID
+    description: |
+      Retrieve a user by their internal User ID.
+    operationId: get-user-item
+    parameters:
+      - $ref: "#/components/parameters/userId"
+    responses:
+      "200":
+        description:
+          $ref: "../../schemas/item_response_schema.yaml#/ItemResponseDesc/description"
+        content:
+          application/json:
+            schema:
+              $ref: "./user_item_response.yaml#/UserItemResponse"
+      "400":
+        $ref: "../../errors/common_errors.yaml#/BadRequest"
+      "401":
+        $ref: "../../errors/common_errors.yaml#/NotAuthenticated"
+      "403":
+        $ref: "../../errors/common_errors.yaml#/NotAuthorized"
+      "404":
+        $ref: "../../errors/common_errors.yaml#/NotFound"
+      "500":
+        $ref: "../../errors/common_errors.yaml#/InternalServerError"
+      "503":
+        $ref: "../../errors/common_errors.yaml#/ServiceUnavailable"
+  delete:
+    summary: Delete user by ID
+    description: |
+      Remove a user from the system by their internal ID.
+
+      Note that the response body is empty on a successful 204 response.
+
+      # START_RAW
+      import DeleteWarning from '@site/content/partials/\_delete-warning.mdx'
+
+      <DeleteWarning itemName='user record' />
+      # END_RAW
+
+      :::info Required abilities
+
+      This operation requires the `User - Delete` ability, or
+      `Authority - Administrator`.
+
+      :::
+    x-required-abilities:
+      - User - Delete
+    operationId: delete-user-item
+    parameters:
+      - $ref: "#/components/parameters/userId"
+      - $ref: "../../parameters/request_headers.yaml#/components/parameters/XRequestedWithHeader"
+      - $ref: "../../parameters/request_headers.yaml#/components/parameters/OriginHeader"
+    responses:
+      "204":
+        description:
+          $ref: "../../headers/modify_item_headers.yaml#/DeleteItemResponseDesc/description"
+      "400":
+        $ref: "../../errors/common_errors.yaml#/BadRequest"
+      "401":
+        $ref: "../../errors/common_errors.yaml#/NotAuthenticated"
+      "403":
+        $ref: "../../errors/common_errors.yaml#/NotAuthorized"
+      "404":
+        $ref: "../../errors/common_errors.yaml#/NotFound"
+      "500":
+        $ref: "../../errors/common_errors.yaml#/InternalServerError"
+      "503":
+        $ref: "../../errors/common_errors.yaml#/ServiceUnavailable"
+  put:
+    summary: Update a user record
+    description: |
+      Update (modify) a user record by their internal ID. This will update the
+      user record with the new data provided in the request body.
+
+      # START_RAW
+      import PutHeaders from '@site/content/partials/_put-headers.mdx'
+
+      <PutHeaders />
+      # END_RAW
+
+      :::info Required abilities
+
+      This operation requires the `User - Modify` ability, or
+      `Authority - Administrator`.
+
+      :::
+
+    operationId: update-user-item
+    x-required-abilities:
+      - User - Modify
+    parameters:
+      - $ref: "#/components/parameters/userId"
+      - $ref: "../../parameters/request_headers.yaml#/components/parameters/IfMatchHeader"
+      - $ref: "../../parameters/request_headers.yaml#/components/parameters/ContentTypeHeader"
+      - $ref: "../../parameters/request_headers.yaml#/components/parameters/XRequestedWithHeader"
+      - $ref: "../../parameters/request_headers.yaml#/components/parameters/OriginHeader"
+    requestBody:
+      required: true
+      description:
+        $ref: "./user_mod.yaml#/components/schemas/UserModifiableFields/description"
+      content:
+        application/json:
+          schema:
+            $ref: "./user_mod.yaml#/components/schemas/UserModifiableFields"
+    responses:
+      "204":
+        description:
+          $ref: "../../headers/modify_item_headers.yaml#/ModifyItemResponseDesc/description"
+        content: {}
+        headers:
+          $ref: "../../headers/modify_item_headers.yaml#/ModifyItemHeaders"
+      "400":
+        $ref: "../../errors/common_errors.yaml#/BadRequest"
+      "401":
+        $ref: "../../errors/common_errors.yaml#/NotAuthenticated"
+      "403":
+        $ref: "../../errors/common_errors.yaml#/NotAuthorized"
+      "404":
+        $ref: "../../errors/common_errors.yaml#/NotFound"
+      "500":
+        $ref: "../../errors/common_errors.yaml#/InternalServerError"
+      "503":
+        $ref: "../../errors/common_errors.yaml#/ServiceUnavailable"

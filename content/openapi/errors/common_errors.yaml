@@ -1,0 +1,113 @@
+# Contains common error responses that can be included in any path.
+
+# Other common responses:
+# 204 - No content
+# 201 - Created
+# 3xx - Redirect
+# 405 - Method not allowed
+
+# 400 - Bad request
+BadRequest:
+  description: |
+    A `400 Bad Request` is returned when the client request was malformed,
+    invalid, or otherwise could not be processed as-is. Usually, the cause for
+    the error is included in the `error.message` field of the response, and the
+    client should correct the request and try again.
+
+
+  content:
+    application/json:
+      schema:
+        $ref: "../schemas/error_response_schema.yaml#/ErrorResponse"
+      # examples:
+
+# 403 - Forbidden (not authorized)
+NotAuthorized:
+  description: |
+    A `403 Forbidden` response means that you are not authorized to perform
+    this action or access this object, or the object does not exist at all.
+
+    The client request may have been valid but the client does not have
+    permission to access the requested resource or perform the requested action.
+
+    :::tip 403 Forbidden also used when objects don't exist
+
+    In most cases, the system will not return a `404 Not Found` error response;
+    it returns `403 Forbidden` both when the object doesn't exist at all,
+    and also when it exists but the client does not have permission to access it.
+    This is a security measure to prevent unauthorized users from determining
+    whether an object exists or not.
+
+    :::
+
+  content:
+    application/json:
+      schema:
+        $ref: "../schemas/error_response_schema.yaml#/ErrorResponse"
+
+# 401 - Unauthorized (not authenticated)
+NotAuthenticated:
+  description: |
+    Not authenticated - you must be signed in to access this resource. Please
+    check the section of the documentation on authentication.
+  content:
+    application/json:
+      schema:
+        $ref: "../schemas/error_response_schema.yaml#/ErrorResponse"
+
+# 404 - Not found
+# Note: most endpoints actually do NOT return a 404 error response, but return
+# a 403 Forbidden response instead. However, there may still be certain
+# cases where a 404 response is returned, so it's included here.
+NotFound:
+  description: |
+    Not found - the requested resource could not be found or does not exist.
+    This may also include cases where the resource does exist, but the client
+    does not have permission to access that resource.
+
+    :::tip 403 Forbidden also used when objects don't exist
+
+    In most cases, the system will not return a `404 Not Found` error response;
+    it returns `403 Forbidden` both when the object doesn't exist at all,
+    and also when it exists but the client does not have permission to access it.
+    This is a security measure to prevent unauthorized users from determining
+    whether an object exists or not.
+
+    :::
+
+  content:
+    application/json:
+      schema:
+        $ref: "../schemas/error_response_schema.yaml#/ErrorResponse"
+
+# 500 - Internal server error
+InternalServerError:
+  description: |
+    Internal server error; an unexpected error occurred on the server. This
+    could be due to a temporary condition or might be the result of a bug in the
+    server software. Also, in some cases, an incorrect client input can
+    trigger this error, and can be resolved by correcting the input.
+
+    If the error persists, please contact support along along with the following
+    details when possible:
+
+    - any error messages received from the server
+    - the full request and response details (full headers and body)
+    - a description of the steps that led to the error
+    - the time range when it occurred.
+
+  content:
+    application/json:
+      schema:
+        $ref: "../schemas/error_response_schema.yaml#/ErrorResponse"
+
+# 503 - Service unavailable
+ServiceUnavailable:
+  description: |
+    Service unavailable - the server is currently unable to handle the request,
+    usually due to maintenance activity on the server. Check if the server's web
+    interface is currently available, or try again later.
+  content:
+    application/json:
+      schema:
+        $ref: "../schemas/error_response_schema.yaml#/ErrorResponse"

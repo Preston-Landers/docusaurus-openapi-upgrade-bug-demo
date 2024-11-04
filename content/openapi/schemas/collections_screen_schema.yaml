@@ -1,0 +1,87 @@
+CollectionsScreen:
+  type: object
+  description: |
+    Defines various user interface properties for the web UI screen that
+    this collection supports. This is an internal object that is read-only
+    on most object endpoints and is not guaranteed to be a stable interface.
+    This mainly defines the search filters available in the UI. This object
+    may not be present in all collections.
+
+    :::warning Not available in every collection
+
+    This key (object) may not be present in all collections that refer
+    to this schema.
+
+    :::
+
+  allOf:
+    - $ref: "../properties/common.yaml#/components/schemas/CommonFields"
+    - $ref: "../properties/creator.yaml#/components/schemas/CreatorFields"
+    - $ref: "../properties/create_timestamps.yaml#/components/schemas/CreateTimestamps"
+    - $ref: "../properties/modifier.yaml#/components/schemas/ModifierFields"
+    - $ref: "../properties/modify_timestamps.yaml#/components/schemas/ModifyTimestamps"
+    - $ref: "../properties/domain_fields.yaml#/components/schemas/DomainFields"
+  properties:
+    allow_customize:
+      type: boolean
+      description: |
+        Indicates whether the user can customize the columns displayed in the
+        screen.
+      example: true
+    cf_filters:
+      type: array
+      description: |
+        A list of custom field filters that are available for this screen.
+      items:
+        $ref: "../collections/custom_fields/custom_field.yaml#/CustomFieldValue"
+    cf_filters_unused:
+      type: array
+      description: |
+        A list of custom field filters that are available for this screen, but
+        are not currently used.
+      items:
+        $ref: "../collections/custom_fields/custom_field.yaml#/CustomFieldValue"
+    fields:
+      type: array
+      description: |
+        The list of fields to show in this management screen's search results.
+      items:
+        $ref: "../collections/screens/screen_field.yaml#/ScreenField"
+    global_allows_customize:
+      type: boolean
+      description: |
+        Indicates whether the screen's global settings allow for per-user
+        customization of the columns displayed in the screen.
+      example: true
+    id_screen:
+      type: string
+      description: |
+        The unique internal ID of this screen. (Same as `id`.)
+        These are fixed values that are defined in the system.
+      readOnly: true
+      example: "accruals"
+    is_global:
+      type: boolean
+      description: |
+        Indicates whether this user is currently user global settings for
+        this screen. If false, the user is using their own settings.
+      example: false
+    other_search_filters:
+      type: array
+      description: |
+        A list of other search filters that are available for this screen.
+      items:
+        type: string
+      example: ["project", "group"]
+    other_search_filters_unused:
+      type: array
+      description: |
+        A list of other search filters that are available for this screen, but
+        are not currently used.
+      items:
+        type: string
+      example: ["px_teams"]
+    properties:
+      type: object
+      description: |
+        A list of additional properties for this screen. Currently unused.

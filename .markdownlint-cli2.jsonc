@@ -1,0 +1,4 @@
+{
+  // Files that markdownlint should check
+  "globs": ["README.md", "content/**/*.md"],
+}

@@ -1,0 +1,68 @@
+# This defines the common format of all error responses that may be returned by the API.
+ErrorResponse:
+  description: |
+    A standard format for error responses that may be returned by the API when various
+    types of errors occur, including authentication (sign-in) failures, authorization
+    (permission) failures, "object not found" (404), internal server errors (500),
+    bad client requests (400) and other types of errors.
+  type: object
+  properties:
+    error:
+      type: object
+      description: |
+        A detailed error object that includes a code and message for the error
+        that occurred. This is useful for client applications to display to
+        users or to log for debugging purposes.
+      properties:
+        code:
+          type: string
+          description: |
+            A short code that identifies the type of error that occurred.
+            This helps group related errors into categories for common
+            treatment in the user interface or client program.
+
+            Some of the common codes are listed on the
+            [Core Concepts#Fixed error codes](/docs/rest-overview#fixed-error-codes)
+            page.
+
+          example: NotFoundOrNotAuthorized
+        message:
+          type: string
+          description: |
+            A human-readable message that describes the error that occurred.
+          example:
+            You must be signed in to access this resource. If you are making an
+            API call, please check the section of the documentation on
+            authentication.
+    errors:
+      type: array
+      description: |
+        An array of error messages that may be returned by the server. Usually
+        this has the same content as the `error` object's `message` field, but
+        this array may contain additional messages or details.
+      items:
+        type: string
+        example:
+          You must be signed in to access this resource. If you are making an
+          API call, please check the section of the documentation on
+          authentication.
+    response_code:
+      type: integer
+      description: |
+        The HTTP status code of the response. This is useful for client
+        applications to determine the type of error that occurred.
+      example: 401
+    success:
+      type: boolean
+      description: |
+        Indicates whether the request was successful (normally false if it's an
+        error response)
+      default: false
+    traceback:
+      type: string
+      description: |
+        A full traceback of the error that occurred on the server. This is
+        useful for debugging and troubleshooting. Note that the traceback is
+        only available if the server is in development mode.
+      example: |
+        Traceback (most recent call last): ... (full traceback)

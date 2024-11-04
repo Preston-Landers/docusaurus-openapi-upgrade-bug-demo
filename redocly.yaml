@@ -1,0 +1,30 @@
+# https://redocly.com/docs/cli/configuration
+extends:
+  - recommended
+
+# Can define multiple APIs here and then refer to them by name
+# Can also define/refer to external APIs.
+
+# apis:
+#   jx@v1:
+#     root: ./content/openapi/journyx_openapi.yaml
+
+theme:
+  openapi:
+    schemaExpansionLevel: 3
+    generateCodeSamples:
+      # As far as I can tell, this is currently either being ignored
+      # or is not working as expected, because the code samples being
+      # generated do not correspond to this list; e.g. Ruby and PowerShell
+      # are present but not listed here. Ironically, if you do list PowerShell
+      # it says it's an unknown language and that the supported language
+      # list is as follows:
+      # `lang` can be one of the following only: "curl", "C#", "Go", "Java",
+      #    "Java8+Apache", "JavaScript", "Node.js", "PHP", "Python", "R", "Ruby"
+      languages:
+        - lang: curl
+        - lang: Python
+        - lang: JavaScript
+        - lang: Node.js
+        - lang: C#
+        - lang: Java

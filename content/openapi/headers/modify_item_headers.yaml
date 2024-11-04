@@ -1,0 +1,16 @@
+DeleteItemResponseDesc:
+  description: |
+    The object was successfully deleted. The response body is empty.
+
+ModifyItemResponseDesc:
+  description: |
+    The object was successfully updated. The response body is empty.
+    See the `Location` header for the URL of the updated object.
+
+ModifyItemHeaders:
+  Location:
+    description: |
+      The URL of the updated or modified object.
+    schema:
+      type: string
+      format: uri

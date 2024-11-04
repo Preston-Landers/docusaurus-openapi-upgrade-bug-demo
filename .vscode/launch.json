@@ -1,0 +1,42 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Launch Docusaurus dev server",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run-script", "start"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Build OpenAPI Spec",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run-script", "openapi-build"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Lint OpenAPI Spec",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run-script", "openapi-lint"],
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+    }
+    // {
+    //   "type": "node",
+    //   "request": "launch",
+    //   "name": "Start OpenAPI Preview",
+    //   "runtimeExecutable": "npm",
+    //   "runtimeArgs": ["run-script", "openapi-start"],
+    //   "cwd": "${workspaceFolder}",
+    //   "console": "integratedTerminal"
+    // }
+  ]
+}

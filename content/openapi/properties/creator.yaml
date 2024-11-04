@@ -1,0 +1,42 @@
+components:
+  schemas:
+    BasicCreatorFields:
+      type: object
+      properties:
+        creator:
+          type: string
+          description: |
+            The internal User ID of the user who created the object.
+          example: 64BBA147B9AC41D9978062300826C89F
+          readOnly: true
+
+    CreatorFields:
+      type: object
+      description: |
+        Fields related to the creation of a resource, including the creation
+        timestamp, creator user ID, and creator user name.
+
+        Note that extended information about the creator user may be included
+        in the `creator_properties` field, depending on the `$keys` requested.
+        If present, this information will follow the schema of the
+        [User](/docs/reference/schemas/user) object.
+      allOf:
+        - $ref: "#/components/schemas/BasicCreatorFields"
+      properties:
+        creator_fullname:
+          type: string
+          description: |
+            The full name of the user who created the object.
+          example: John Doe
+          readOnly: true
+        creator_properties:
+          type: object
+          # See comments about nullable here in modifier.yaml
+          # nullable: true
+          readOnly: true
+          description: |
+            Extended information about the [User](/docs/reference/schemas/user) who
+            created the object.
+            This field is only included if the `$keys` parameter requests it.
+          allOf:
+            - $ref: "../collections/users/user.yaml#/User"

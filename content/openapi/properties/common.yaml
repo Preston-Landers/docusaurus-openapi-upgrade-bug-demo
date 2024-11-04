@@ -1,0 +1,44 @@
+components:
+  schemas:
+    CommonFields:
+      type: object
+      description: |
+        These are fields that are common to most object types.
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: |
+            The internal ID of the resource or object.
+
+            In general, the `id` field is the primary key of the object and cannot
+            be changed or updated.
+          example: 64BBA147B9AC41D9978062300826C89F
+          readOnly: true
+
+        uri:
+          type: string
+          format: uri-reference
+          description: |
+            The URI associated with this resource. This is usually
+            a relative URL that can be used to access the resource.
+            Typically it incorporates the Unique ID of the resource.
+          example: /api/v1/objects/64BBA147B9AC41D9978062300826C89F
+          readOnly: true
+
+        tablename:
+          type: string
+          description: |
+            The name of the internal database table associated with this
+            resource.
+          example: users
+          readOnly: true
+
+        table_label:
+          type: string
+          description: |
+            The user-visible label of the database table associated with this object.
+          readOnly: true
+          example: codes_pay_types
+
+        # pname and id_domain are common but not universal

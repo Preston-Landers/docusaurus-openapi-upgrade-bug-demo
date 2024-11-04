@@ -1,0 +1,13 @@
+# This indicates that when we return a User from the API,
+# it's wrapped in the standard ItemResponse under the results key.
+UserItemResponse:
+  allOf:
+    - $ref: "../../schemas/item_response_schema.yaml#/ItemResponse"
+    - type: object
+      properties:
+        results:
+          $ref: "./user.yaml#/User"
+          # type: object
+          # # description: The user being returned.
+          # items:
+          #   $ref: "./user.yaml#/User"

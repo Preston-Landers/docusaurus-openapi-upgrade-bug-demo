@@ -1,0 +1,186 @@
+# This is the schema that describes the structure of a User object
+# as returned from the /users collection.
+# There is a separate schema creating and modifying users,
+# as many of these fields are read-only.
+User:
+  type: object
+  description: |
+    A user account in the JX system.
+
+  # TODO: for better control of ordering in how these are listed, we might
+  # want to put the main fields in this file into a separate file and just
+  # list the ref here in the right slot.
+  allOf:
+    - $ref: "../../properties/common.yaml#/components/schemas/CommonFields"
+    - $ref: "./user_mod.yaml#/components/schemas/UserModifiableFields"
+    - $ref: "../../properties/status.yaml#/components/schemas/ObjectStatusFields"
+    - $ref: "../../properties/custom_fields.yaml#/components/schemas/CustomFields"
+    - $ref: "../../properties/creator.yaml#/components/schemas/CreatorFields"
+    - $ref: "../../properties/create_timestamps.yaml#/components/schemas/CreateTimestamps"
+    - $ref: "../../properties/modifier.yaml#/components/schemas/ModifierFields"
+    - $ref: "../../properties/modify_timestamps.yaml#/components/schemas/ModifyTimestamps"
+    - $ref: "../../properties/domain_fields.yaml#/components/schemas/DomainFields"
+  properties:
+    daysinlist:
+      type: integer
+      description: |
+        **UNUSED FIELD** This is a legacy field that is no longer used.
+      readOnly: true
+
+    email:
+      type: string
+      description: |
+        The email address of the user.
+
+        **Note:** This is a read-only field. To change the user's email address, you must modify the
+        `users_attribs:users_email` field.
+
+      #        **TODO:** API should support modifying this field directly.
+      readOnly: true
+
+    first_name:
+      type: string
+      description: |
+        The first name of the user.
+
+        Note: read-only; set via the `fullname` field.
+      readOnly: true
+
+    id_user:
+      type: string
+      description: |
+        The unique internal ID of this user. (Same as `id`.)
+      readOnly: true
+      example: "5CD906A3941C463B9CC98F49DBCC25AA"
+
+    last_name:
+      type: string
+      description: |
+        The last name of the user.
+
+        Note: read-only; set via the `fullname` field.
+      readOnly: true
+
+    memorized_sheet_choices:
+      type: array
+      description: |
+        A list of memorized timesheets associated with the user.
+
+        These are the choices available to set in the `default_memorized_sheet` field.
+      readOnly: true
+      items:
+        type: object
+        properties:
+          value:
+            type: string
+            description: The internal ID of the memorized timesheet.
+          text:
+            type: string
+            description: The name of the memorized timesheet.
+
+    reserved1:
+      type: string
+      # nullable: true
+      description: |
+        **UNUSED FIELD** This is a legacy field that is no longer used.
+      readOnly: true
+    reserved2:
+      type: number
+      format: float
+      description: |
+        **UNUSED FIELD** This is a legacy field that is no longer used.
+      readOnly: true
+    reserved3:
+      type: number
+      format: float
+      description: |
+        **UNUSED FIELD** This is a legacy field that is no longer used.
+      readOnly: true
+
+    timerecs_out:
+      type: integer
+      description: |
+        **UNUSED FIELD** This is a legacy field that is no longer used.
+      readOnly: true
+
+    time_gui:
+      type: string
+      description: |
+        The ID of the user's assigned time entry screen configuration.
+    time_gui_properties:
+      type: object
+      # nullable: true
+      description: |
+        Details about the user's assigned time entry screen configuration.
+      readOnly: true
+      # properties: ...
+      # TODO: need to define this object externally
+      #   (note there is no independent endpoint for these yet)
+
+    travel_gui:
+      type: string
+      description: |
+        The ID of the user's assigned Custom Entry (a.k.a. Mileage or Travel)
+        entry screen configuration.
+    travel_gui_properties:
+      type: object
+      # nullable: true
+      description: |
+        Details about the user's assigned Custom Entry (a.k.a. Mileage or Travel)
+        entry screen configuration.
+      readOnly: true
+      # properties: ...
+      # TODO: need to define this object externally
+
+    expense_gui:
+      type: string
+      description: |
+        The ID of the user's assigned Expense entry screen configuration.
+    expense_gui_properties:
+      type: object
+      # nullable: true
+      description: |
+        Details about the user's assigned Expense entry screen configuration.
+      readOnly: true
+      # properties: ...
+      # TODO: need to define this object externally
+
+    # Note: this is defined in the common.yaml file. There doesn't seem
+    # to be a good way to use that while providing a specific example here.
+    # https://stackoverflow.com/questions/62261316
+  #    table_label:
+  #      example: users
+
+  # TODO: need to spec the following fields that are extended/named keys only:
+  # roles:
+  # teams:
+  # "projects" - this is actually really assignments
+  # abilities
+  # dropdownthreshold
+
+  # There's also some weird ones that don't respond to $keys
+  # like they should only special query params.
+  # holidays, leave_requests
+
+  # A pattern that defines Custom Field values.
+  # Important: the plugin we're currently using `docusaurus-plugin-openapi-docs`
+  # doesn't seem to support patternProperties. I'm investigating if this is
+  # a known issue, whether support is planned, etc.
+  # It seems like possibly Redocly's equivalent plugin does support this.
+  # https://github.com/Redocly/redoc/issues/1983
+  # I had set up that plugin but then switched to the other because it looked nicer.
+  # patternProperties:
+  #   ^users_attribs:[A-F0-9]{32}$:
+  #     oneOf:
+  #       - type: string
+  #       - type: number
+  #       - type: array
+  #         items:
+  #           oneOf:
+  #             - type: string
+  #             - type: number
+  #     description: |
+  #       A User Custom Field value. The Custom Field (aka "Attribute") has a
+  #       32-character hexadecimal ID. The value may be a string, number, or array
+  #       of strings or numbers in the case of a multi-value field.
+  additionalProperties: false

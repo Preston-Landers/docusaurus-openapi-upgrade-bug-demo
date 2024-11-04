@@ -1,0 +1,30 @@
+ItemResponseDesc:
+  description: |
+    A successful response with a single item object;
+    see the `results` key in the response body.
+
+ItemResponse:
+  description: |
+    A standard success response includes a single item (object), and other metadata.
+  type: object
+  properties:
+    response_code:
+      type: integer
+      description: HTTP status code of the response for reference purposes.
+      example: 200
+      default: 200
+    results:
+      type: object
+      # Note: if we DON'T put a description here, it allows
+      # a description to be defined in the specific resource definition, e.g. user_item_response.yaml
+    success:
+      type: boolean
+      description: |
+        Indicates whether the request was successful (normally true if it's not
+        an error response)
+      default: true
+    uri:
+      type: string
+      description:
+        URL of the current request / resource, for reference purposes.
+      example: https://example.apps.journyx.com/api/v1/users

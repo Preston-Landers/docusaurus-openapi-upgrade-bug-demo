@@ -1,0 +1,151 @@
+# This represents the modifiable fields of the User object, not [end] "user-modifiable" necessarily.
+
+# TODO:
+#  More modifiable fields: rate_policy_properties -> id_policy
+
+components:
+  schemas:
+    UserModifiableFields:
+      type: object
+      description: |
+        These are fields in the User object that can be modified (not necessarily by the user in question)
+        or given as input when creating a new User.
+
+        :::tip
+
+        Note that only `user_login` and `fullname` are required when creating a new User.
+
+        :::
+
+        **Note:** If using SSO (Single Sign-On), the `user_login` field usually
+        needs to match the user's email address, UPN, or other primary identifier in
+        the external authentication system.
+
+        :::warning
+
+        The `new_pw`, `new_pw2`, and `expire_new_pw` fields should only be used when
+        intending to change the user's password.
+
+        :::
+
+      required:
+        - user_login
+        - fullname
+      allOf:
+        - $ref: "../../properties/groups.yaml#/components/schemas/GroupFields"
+      properties:
+        user_login:
+          type: string
+          description: |
+            The login name of the user.
+          example: john.smith@example.com
+
+        fullname:
+          type: string
+          description: The full name of the user.
+          example: John Smith
+
+        u_comment:
+          # type: ['string', 'null']
+          type: string
+          # nullable: true
+          description: The default comment on the user's time entry screen.
+
+        # note this overrides the definition of "status" common to most objects
+        # in status.yaml, because users aren't 'loggable' or 'reportable only', they
+        # are 'active', or 'inactive' (or hidden).
+        status:
+          type: string
+          description: |
+            The status of the user; either `hidden`, `active`, or `inactive`.
+
+        default_memorized_sheet:
+          type: string
+          description: |
+            The ID of the user's default memorized timesheet.
+          # nullable: true
+
+        dropdownthreshold:
+          type: integer
+          description: |
+            The number of items in a selection list to trigger a forced search.
+
+        # This is special to the User object
+        hide:
+          type: boolean
+          description: |
+            Indicates whether the user is hidden.
+
+            Note: the User object is the only one that uses this field; other objects
+            use `is_hidden`.
+
+        # Password fields
+
+        expire_new_pw:
+          type: boolean
+          description: |
+            Whether the user's new password should expire after the first login.
+
+        new_pw:
+          type: string
+          description: |
+            The new password for the user.
+
+            The password must also be set in the `new_pw2` field to confirm the change.
+
+        new_pw2:
+          type: string
+          description: |
+            The new password for the user, repeated to confirm the change.
+
+            The password must also be set in the `new_pw` field to confirm the change.
+
+        roles:
+          type: array
+          description: |
+            A list of role IDs belonging to this user.
+
+            This list can be modified to change the user's roles.
+          items:
+            type: string
+            description: The internal ID of a role.
+
+        timerecs_in:
+          type: integer
+          description: The number of blank rows to show on the entry screen.
+          example: 3
+
+        # "Periods" aka how many days is each entry sheet
+
+        time_period:
+          type: string
+          description: |
+            The "Entry Screen period" (time-span) associated with the user's Time Entry screen.
+          example: default_weekly
+        expense_period:
+          type: string
+          description: |
+            The "Entry Screen period" (time-span) associated with the user's Expense Entry screen.
+          example: default_weekly
+        custom_period:
+          type: string
+          description: |
+            The "Entry Screen period" (time-span) associated with the user's Custom Entry screen.
+          example: default_weekly
+
+        # GUIs aka Entry Screens [settings groups].
+
+        expense_gui:
+          type: string
+          description: |
+            The Entry Screen ID (aka GUI) of the user's Expense Entry screen.
+
+        time_gui:
+          type: string
+          description:
+            The Entry Screen ID (aka GUI) of the user's Time Entry screen.
+
+        travel_gui:
+          type: string
+          description:
+            The Entry Screen ID (aka GUI) of the user's Custom Entry screen.

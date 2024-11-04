@@ -1,0 +1,17 @@
+CreateItemHeaders:
+  Location:
+    description: |
+      The URL of the newly created object.
+    schema:
+      type: string
+      format: uri
+  X-Item-Id:
+    description: |
+      The ID of the newly created object.
+    schema:
+      type: string
+  X-Item-Table:
+    description: |
+      The name of the table where the object was created.
+    schema:
+      type: string

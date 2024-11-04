@@ -1,0 +1,110 @@
+components:
+  schemas:
+    GroupNamesField:
+      type: object
+      description: |
+        This is the `group_names` field which is attached to many object types to provide
+        a convenient representation of the Groups that an object belongs to, including
+        both name and ID.
+      properties:
+        group_names:
+          type: array
+          description: |
+            A list of Groups (names and IDs) that the object belongs to.
+
+            This is a read-only list. To change the Groups that an object belongs to,
+            use the `groups` field.
+
+            See [GroupFields](/docs/reference/schemas/groupfields)
+            for additional information about Groups and this field.
+
+          readOnly: true
+          # nullable: true
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+                description: |
+                  The Group ID.
+              pname:
+                type: string
+                description: |
+                  The Group name.
+              uri:
+                type: string
+                description: |
+                  The URI of the Group.
+
+                  WARNING: this field is planned in a future release but
+                  is not yet available.
+          example:
+            - id: 5088C427E8B64EBEBE1C5B5961DB1902
+              pname: "Sales"
+            - id: 3553F715A6F54DAB95D0D25B08468195
+              pname: "Accounting"
+
+    GroupFields:
+      type: object
+      description: |
+        These are group-related fields that are common to most object types.
+
+        Please note that these fields may not be present in the response unless
+        the `$keys` query parameter includes the field name, e.g. `$keys=groups`.
+
+        See Collection#Selecting Fields
+        for more information about the `$keys` parameter.
+
+        The `$keys=$extended` parameter will also include the `group_names` field.
+
+        In general, Groups determine the visibility of objects to each user in the system.
+        For example, a user can only see objects that belong to a Group that
+        they are themselves a member of.
+
+        When creating or modifying objects with `POST` or `PUT` requests, you can
+        only use the `groups` field to specify the Group IDs that the object belongs to.
+        The `group_names` field is read-only.
+
+        If an object does not belong to any groups, it is considered to be "hidden"
+        and the `is_hidden` field will be set to `true`. Hidden objects are normally
+        only accessible to administrators, and then only if the `$filter` query parameter
+        is used to include hidden status objects.
+
+        For most object types, that would be done with a filter like this:
+
+        ```
+        $filter = status_code intersects ["lr","ro","h"]
+        ```
+
+        The [Users](/docs/reference/list-users) collection can be filtered
+        like this to show hidden users:
+
+        ```
+        $filter = status intersects ["active","inactive","hidden"]
+        ```
+
+        You can read more about Filtering in the
+        section on Collections.
+
+        If you **only** want hidden objects, just remove the other status codes from
+        the filter.
+
+      allOf:
+        - $ref: "#/components/schemas/GroupNamesField"
+      properties:
+        groups:
+          type: array
+          # nullable: true
+          description: |
+            A list of Group IDs that the object belongs to.
+            See [GroupFields](/docs/reference/schemas/groupfields)
+            for additional information about Groups and this field.
+          items:
+            type: string
+            format: uuid
+            description: |
+              A Group ID that the object belongs to.
+          example:
+            - 5088C427E8B64EBEBE1C5B5961DB1902
+            - 3553F715A6F54DAB95D0D25B08468195

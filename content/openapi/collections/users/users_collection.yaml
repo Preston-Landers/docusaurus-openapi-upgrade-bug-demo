@@ -1,0 +1,11 @@
+UserCollectionResponse:
+  allOf:
+    - $ref: "../../schemas/paged_response_schema.yaml#/PagedResponse"
+    - type: object
+      properties:
+        results:
+          type: array
+          description:
+            $ref: "./user.yaml#/User/description"
+          items:
+            $ref: "./user.yaml#/User"

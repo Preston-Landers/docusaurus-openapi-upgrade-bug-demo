@@ -1,0 +1,80 @@
+# The following ResultsDesc/description text can be reused as the
+# description field for any collection response that includes a `results` array.
+# Typical usage:
+
+# projects-collection:
+#   get:
+#     summary: List projects
+#     responses:
+#       "200":
+#         description:
+#           $ref: "../../schemas/paged_response_schema.yaml#/ResultsDesc/description"
+#         content:
+#           application/json:
+#             schema:
+#               $ref: "./projects_collection.yaml#/ProjectCollectionResponse"
+
+ResultsDesc:
+  description: |
+    A successful response from a paged collection; see the `results` array in the
+    response for the list of results for this page. Additional pages may be
+    available and can be fetched using the `@nextLink` URL.
+
+    Note that the examples given may include keys (fields) that may not always be
+    present in the response, depending on the fields requested in the `$keys`
+    parameter, the user's permissions, and other system settings.
+
+# This schema is used as the response schema for most collection endpoints.
+PagedResponse:
+  description: |
+    A standard success response that may be returned by the API for most
+    collection endpoints. This response includes a list of result objects (items),
+    a count of the total number of items matching the query, and other metadata.
+  type: object
+  properties:
+    response_code:
+      type: integer
+      description: HTTP status code of the response for reference purposes.
+      example: 200
+      default: 200
+    success:
+      type: boolean
+      description: |
+        Indicates whether the request was successful (normally `true` if it's
+        not an error response).
+      default: true
+    uri:
+      type: string
+      description:
+        URL of the current request / resource, for reference purposes.
+      example: https://example.apps.journyx.com/api/v1/users
+    $count:
+      type: integer
+      description: |
+        The total number of items matching the query; not the number of items in
+        the current response.
+      example: 100
+    $skip:
+      type: integer
+      description: |
+        The number of items skipped in the query; in other words, the offset of
+        the first item in the current response compared to the total set of
+        items in the collection. When used as a query parameter, this is the
+        number of items to skip over.
+      example: 0
+    $top:
+      type: integer
+      description: |
+        The number of items returned in the current response. When used as a
+        query parameter, this is the maximum number of items to return.
+      example: 10
+    "@nextLink":
+      type: string
+      description: The URL to fetch the next set (page) of results.
+      example: https://example.apps.journyx.com/api/v1/users?$top=10&$skip=10
+    results:
+      type: array
+      # description: The list of items in the collection.
+      items:
+        type: object
+        # description: Placeholder for specific collection items.

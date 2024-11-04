@@ -1,0 +1,1497 @@
+openapi: 3.0.0
+info:
+  title: Journyx REST API
+  description: |
+    Welcome to the API Reference section of the Journyx JX / PX technical
+    documentation.
+
+    Before diving into the API Reference, make sure you have reviewed
+    the [Introduction](/docs/intro) and Core Concepts
+    sections as these contain essential background information.
+
+    :::info Review the Collections page
+
+    A key part of using the Journyx API is understanding the
+    Collections concept. Collections are groups of similar
+    objects, such as users, projects, or time entries, and they have common
+    endpoints and behaviors relating to selecting fields, filtering, sorting,
+    and pagination. These features are explained in detail on the
+    Collections page.
+
+    :::
+  version: 0.0.1
+  license:
+    name: Commercial License
+    url: https://journyx.com/wp-content/uploads/2023/08/termsofuse.pdf
+servers:
+  - url: https://example.apps.journyx.com/api/v1
+security:
+  - wtsession: []
+  - http-basic: []
+paths:
+  /users:
+    get:
+      summary: List users
+      description: |
+        Retrieve a list of users in the system.
+      operationId: list-users
+      parameters:
+        - $ref: '#/components/parameters/$top'
+        - $ref: '#/components/parameters/$skip'
+        - $ref: '#/components/parameters/$keys'
+        - $ref: '#/components/parameters/$filter'
+        - $ref: '#/components/parameters/$orderBy'
+      responses:
+        '200':
+          description: |
+            A successful response from a paged collection; see the `results` array in the
+            response for the list of results for this page. Additional pages may be
+            available and can be fetched using the `@nextLink` URL.
+
+            Note that the examples given may include keys (fields) that may not always be
+            present in the response, depending on the fields requested in the `$keys`
+            parameter, the user's permissions, and other system settings.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserCollectionResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '403':
+          $ref: '#/components/responses/NotAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+    post:
+      summary: Create a user
+      description: |
+        Add a new user to the system.
+
+        :::info Required abilities
+
+        This operation requires the `User - Add` ability, or
+        `Authority - Administrator`.
+
+        :::
+      operationId: create-user
+      x-required-abilities:
+        - User - Add
+      requestBody:
+        required: true
+        description: |
+          These are fields in the User object that can be modified (not necessarily by the user in question)
+          or given as input when creating a new User.
+
+          :::tip
+
+          Note that only `user_login` and `fullname` are required when creating a new User.
+
+          :::
+
+          **Note:** If using SSO (Single Sign-On), the `user_login` field usually
+          needs to match the user's email address, UPN, or other primary identifier in
+          the external authentication system.
+
+          :::warning
+
+          The `new_pw`, `new_pw2`, and `expire_new_pw` fields should only be used when
+          intending to change the user's password.
+
+          :::
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserModifiableFields'
+      parameters:
+        - $ref: '#/components/parameters/ContentTypeHeader'
+        - $ref: '#/components/parameters/XRequestedWithHeader'
+        - $ref: '#/components/parameters/OriginHeader'
+      responses:
+        '201':
+          description: |
+            The item was successfully created.
+
+            This is a minimal response that indicates whether the request was successful and provides the
+            URI of the created item. To retrieve additional details or the full item, you may need to make
+            additional requests.
+
+            :::info
+
+            See the `Location` header for the URL of the new item,
+            as well as the `X-Item-Id` and `X-Item-Table` headers for the ID and
+            table name of the new item.
+
+            :::
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateItemResponse'
+          headers:
+            Location:
+              description: |
+                The URL of the newly created object.
+              schema:
+                type: string
+                format: uri
+            X-Item-Id:
+              description: |
+                The ID of the newly created object.
+              schema:
+                type: string
+            X-Item-Table:
+              description: |
+                The name of the table where the object was created.
+              schema:
+                type: string
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '403':
+          $ref: '#/components/responses/NotAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+  /users/{userId}:
+    get:
+      summary: Get user by ID
+      description: |
+        Retrieve a user by their internal User ID.
+      operationId: get-user-item
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      responses:
+        '200':
+          description: |
+            A successful response with a single item object;
+            see the `results` key in the response body.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserItemResponse'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '403':
+          $ref: '#/components/responses/NotAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+    delete:
+      summary: Delete user by ID
+      description: |
+        Remove a user from the system by their internal ID.
+
+        Note that the response body is empty on a successful 204 response.
+
+        # START_RAW
+        import DeleteWarning from '@site/content/partials/\_delete-warning.mdx'
+
+        <DeleteWarning itemName='user record' />
+        # END_RAW
+
+        :::info Required abilities
+
+        This operation requires the `User - Delete` ability, or
+        `Authority - Administrator`.
+
+        :::
+      x-required-abilities:
+        - User - Delete
+      operationId: delete-user-item
+      parameters:
+        - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/XRequestedWithHeader'
+        - $ref: '#/components/parameters/OriginHeader'
+      responses:
+        '204':
+          description: |
+            The object was successfully deleted. The response body is empty.
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '403':
+          $ref: '#/components/responses/NotAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+    put:
+      summary: Update a user record
+      description: |
+        Update (modify) a user record by their internal ID. This will update the
+        user record with the new data provided in the request body.
+
+        # START_RAW
+        import PutHeaders from '@site/content/partials/_put-headers.mdx'
+
+        <PutHeaders />
+        # END_RAW
+
+        :::info Required abilities
+
+        This operation requires the `User - Modify` ability, or
+        `Authority - Administrator`.
+
+        :::
+      operationId: update-user-item
+      x-required-abilities:
+        - User - Modify
+      parameters:
+        - $ref: '#/components/parameters/userId'
+        - $ref: '#/components/parameters/IfMatchHeader'
+        - $ref: '#/components/parameters/ContentTypeHeader'
+        - $ref: '#/components/parameters/XRequestedWithHeader'
+        - $ref: '#/components/parameters/OriginHeader'
+      requestBody:
+        required: true
+        description: |
+          These are fields in the User object that can be modified (not necessarily by the user in question)
+          or given as input when creating a new User.
+
+          :::tip
+
+          Note that only `user_login` and `fullname` are required when creating a new User.
+
+          :::
+
+          **Note:** If using SSO (Single Sign-On), the `user_login` field usually
+          needs to match the user's email address, UPN, or other primary identifier in
+          the external authentication system.
+
+          :::warning
+
+          The `new_pw`, `new_pw2`, and `expire_new_pw` fields should only be used when
+          intending to change the user's password.
+
+          :::
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserModifiableFields'
+      responses:
+        '204':
+          description: |
+            The object was successfully updated. The response body is empty.
+            See the `Location` header for the URL of the updated object.
+          content: {}
+          headers:
+            Location:
+              description: |
+                The URL of the updated or modified object.
+              schema:
+                type: string
+                format: uri
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/NotAuthenticated'
+        '403':
+          $ref: '#/components/responses/NotAuthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+components:
+  securitySchemes:
+    wtsession:
+      description: |
+        Authentication is described in more detail in the dedicated
+        Authentication section of the documentation.
+      type: apiKey
+      in: cookie
+      name: wtsession
+    http-basic:
+      description: |
+        HTTP Basic Authentication; this authenticates each request separately
+        with a username and either a password or an API Key. This is less performant
+        than using a `wtsession` cookie, so we recommend using the `wtsession`
+        cookie instead. However, HTTP Basic Auth is often useful for testing
+        and for simple scripts.
+
+        Please see the Authentication section for
+        complete details.
+      type: http
+      scheme: basic
+  parameters:
+    $top:
+      name: $top
+      in: query
+      required: false
+      schema:
+        type: integer
+        maximum: 1000
+        minimum: 1
+        default: 100
+      description: |
+        The maximum number of objects to return. The default may vary from
+        endpoint to endpoint, but is typically 100.
+      example: 10
+    $skip:
+      name: $skip
+      in: query
+      required: false
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      description: |
+        The number of objects to skip before returning results.
+      example: 0
+    $keys:
+      name: $keys
+      in: query
+      required: false
+      schema:
+        type: string
+      description: |
+        Specifies which keys (data values) to include in objects in the response. If this
+        parameter is not given, typically most keys are included unless they are
+        expensive to compute or return.
+
+        This parameter can be repeated to request multiple keys.
+
+        Any regular field can be named here, though many are automatically
+        included by default and don't need to be specified.
+
+        Special values are:
+        - `$base` - only include the base object fields, which is usually much faster.
+          Note that if `$base` is specified, no other keys will be included even if
+          they are specified here.
+        - `$extended` - include all extended properties, such as custom fields.
+      example: creator_properties.fullname
+    $filter:
+      name: $filter
+      in: query
+      required: false
+      schema:
+        type: string
+      description: |
+        A filter specification string.
+
+        See the [Collections#Filtering](/docs/collections#filtering) page for more
+        information.
+
+        <ins>Important:</ins> all string literals must be JSON-encoded; for
+        example, a string literal must be enclosed in double quotes (`"`) and
+        any double quotes within the string must be escaped with a backslash
+        (`\"`), as shown in the example.
+      example: pname eq "Embedded \" Quote Project"
+    $orderBy:
+      name: $orderBy
+      in: query
+      required: false
+      schema:
+        type: string
+        default: pname asc
+      description: |
+        The field to sort by, optionally followed by a space and the sort direction. If this
+        parameter is not given, the default sort field is typically `pname` if available. Specify
+        additional secondary sort fields by separating them with commas. This field is not
+        case-sensitive.
+
+        The sort direction can be `asc` (ascending) or `desc` (descending).
+
+        If not specified, the default sort direction is usually ascending.
+
+        This parameter can be repeated to sort by multiple fields, or you
+        can comma-separate multiple fields in a single parameter.
+
+        <ins>Important:</ins> not all fields are sortable. If you attempt to
+        sort by a non-sortable field, the API will return an 400 Bad Request
+        error.
+      example: creator.fullname desc, pname asc
+    ContentTypeHeader:
+      name: Content-Type
+      in: header
+      required: true
+      schema:
+        type: string
+      description: |
+        The Content-Type header is required for all `POST` or `PUT` requests
+        that have a request body.
+
+        The value should normally be `application/json` assuming
+        you are sending [JSON data](https://en.wikipedia.org/wiki/JSON).
+      example: application/json
+    XRequestedWithHeader:
+      name: X-Requested-With
+      in: header
+      required: true
+      schema:
+        type: string
+      description: |
+        The X-Requested-With header is required for all `POST`, `PUT`, and `DELETE` requests.
+        This is an [anti-CSRF](https://en.wikipedia.org/wiki/Cross-site_request_forgery)
+        measure.
+
+        The value should be `XMLHttpRequest`.
+      example: XMLHttpRequest
+    OriginHeader:
+      name: Origin
+      in: header
+      required: true
+      schema:
+        type: string
+      description: |
+        The `Origin` header is required for all `POST`, `PUT`, and `DELETE` requests.
+        This is an [anti-CSRF](https://en.wikipedia.org/wiki/Cross-site_request_forgery)
+        measure.
+
+        The value should be the base URL of the service you are calling.
+
+        The `Referer` header can also be used in place of `Origin`.
+        Please note the unusual spelling of `Referer`.
+      example: https://example.apps.journyx.com
+    userId:
+      name: userId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: |
+        The internal ID of the user to retrieve or modify.
+      example: 64BBA147B9AC41D9978062300826C89F
+    IfMatchHeader:
+      name: If-Match
+      in: header
+      required: true
+      schema:
+        type: string
+      description: |
+        The `If-Match` header is *required* for all `PUT` requests that modify
+        objects. The value should be the current ETag value of the object you
+        are modifying, which can be obtained from the `ETag` header of the
+        object's `GET` response. This is to ensure you are not accidentally
+        overwriting changes made by another client.
+      example: 333c3873b9a60...
+  schemas:
+    PagedResponse:
+      description: |
+        A standard success response that may be returned by the API for most
+        collection endpoints. This response includes a list of result objects (items),
+        a count of the total number of items matching the query, and other metadata.
+      type: object
+      properties:
+        response_code:
+          type: integer
+          description: HTTP status code of the response for reference purposes.
+          example: 200
+          default: 200
+        success:
+          type: boolean
+          description: |
+            Indicates whether the request was successful (normally `true` if it's
+            not an error response).
+          default: true
+        uri:
+          type: string
+          description: URL of the current request / resource, for reference purposes.
+          example: https://example.apps.journyx.com/api/v1/users
+        $count:
+          type: integer
+          description: |
+            The total number of items matching the query; not the number of items in
+            the current response.
+          example: 100
+        $skip:
+          type: integer
+          description: |
+            The number of items skipped in the query; in other words, the offset of
+            the first item in the current response compared to the total set of
+            items in the collection. When used as a query parameter, this is the
+            number of items to skip over.
+          example: 0
+        $top:
+          type: integer
+          description: |
+            The number of items returned in the current response. When used as a
+            query parameter, this is the maximum number of items to return.
+          example: 10
+        '@nextLink':
+          type: string
+          description: The URL to fetch the next set (page) of results.
+          example: https://example.apps.journyx.com/api/v1/users?$top=10&$skip=10
+        results:
+          type: array
+          items:
+            type: object
+    CommonFields:
+      type: object
+      description: |
+        These are fields that are common to most object types.
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: |
+            The internal ID of the resource or object.
+
+            In general, the `id` field is the primary key of the object and cannot
+            be changed or updated.
+          example: 64BBA147B9AC41D9978062300826C89F
+          readOnly: true
+        uri:
+          type: string
+          format: uri-reference
+          description: |
+            The URI associated with this resource. This is usually
+            a relative URL that can be used to access the resource.
+            Typically it incorporates the Unique ID of the resource.
+          example: /api/v1/objects/64BBA147B9AC41D9978062300826C89F
+          readOnly: true
+        tablename:
+          type: string
+          description: |
+            The name of the internal database table associated with this
+            resource.
+          example: users
+          readOnly: true
+        table_label:
+          type: string
+          description: |
+            The user-visible label of the database table associated with this object.
+          readOnly: true
+          example: codes_pay_types
+    GroupNamesField:
+      type: object
+      description: |
+        This is the `group_names` field which is attached to many object types to provide
+        a convenient representation of the Groups that an object belongs to, including
+        both name and ID.
+      properties:
+        group_names:
+          type: array
+          description: |
+            A list of Groups (names and IDs) that the object belongs to.
+
+            This is a read-only list. To change the Groups that an object belongs to,
+            use the `groups` field.
+
+            See [GroupFields](/docs/reference/schemas/groupfields)
+            for additional information about Groups and this field.
+          readOnly: true
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                format: uuid
+                description: |
+                  The Group ID.
+              pname:
+                type: string
+                description: |
+                  The Group name.
+              uri:
+                type: string
+                description: |
+                  The URI of the Group.
+
+                  WARNING: this field is planned in a future release but
+                  is not yet available.
+          example:
+            - id: 5088C427E8B64EBEBE1C5B5961DB1902
+              pname: Sales
+            - id: 3553F715A6F54DAB95D0D25B08468195
+              pname: Accounting
+    GroupFields:
+      type: object
+      description: |
+        These are group-related fields that are common to most object types.
+
+        Please note that these fields may not be present in the response unless
+        the `$keys` query parameter includes the field name, e.g. `$keys=groups`.
+
+        See Collection#Selecting Fields
+        for more information about the `$keys` parameter.
+
+        The `$keys=$extended` parameter will also include the `group_names` field.
+
+        In general, Groups determine the visibility of objects to each user in the system.
+        For example, a user can only see objects that belong to a Group that
+        they are themselves a member of.
+
+        When creating or modifying objects with `POST` or `PUT` requests, you can
+        only use the `groups` field to specify the Group IDs that the object belongs to.
+        The `group_names` field is read-only.
+
+        If an object does not belong to any groups, it is considered to be "hidden"
+        and the `is_hidden` field will be set to `true`. Hidden objects are normally
+        only accessible to administrators, and then only if the `$filter` query parameter
+        is used to include hidden status objects.
+
+        For most object types, that would be done with a filter like this:
+
+        ```
+        $filter = status_code intersects ["lr","ro","h"]
+        ```
+
+        The [Users](/docs/reference/list-users) collection can be filtered
+        like this to show hidden users:
+
+        ```
+        $filter = status intersects ["active","inactive","hidden"]
+        ```
+
+        You can read more about Filtering in the
+        section on Collections.
+
+        If you **only** want hidden objects, just remove the other status codes from
+        the filter.
+      allOf:
+        - $ref: '#/components/schemas/GroupNamesField'
+      properties:
+        groups:
+          type: array
+          description: |
+            A list of Group IDs that the object belongs to.
+            See [GroupFields](/docs/reference/schemas/groupfields)
+            for additional information about Groups and this field.
+          items:
+            type: string
+            format: uuid
+            description: |
+              A Group ID that the object belongs to.
+          example:
+            - 5088C427E8B64EBEBE1C5B5961DB1902
+            - 3553F715A6F54DAB95D0D25B08468195
+    UserModifiableFields:
+      type: object
+      description: |
+        These are fields in the User object that can be modified (not necessarily by the user in question)
+        or given as input when creating a new User.
+
+        :::tip
+
+        Note that only `user_login` and `fullname` are required when creating a new User.
+
+        :::
+
+        **Note:** If using SSO (Single Sign-On), the `user_login` field usually
+        needs to match the user's email address, UPN, or other primary identifier in
+        the external authentication system.
+
+        :::warning
+
+        The `new_pw`, `new_pw2`, and `expire_new_pw` fields should only be used when
+        intending to change the user's password.
+
+        :::
+      required:
+        - user_login
+        - fullname
+      allOf:
+        - $ref: '#/components/schemas/GroupFields'
+      properties:
+        user_login:
+          type: string
+          description: |
+            The login name of the user.
+          example: john.smith@example.com
+        fullname:
+          type: string
+          description: The full name of the user.
+          example: John Smith
+        u_comment:
+          type: string
+          description: The default comment on the user's time entry screen.
+        status:
+          type: string
+          description: |
+            The status of the user; either `hidden`, `active`, or `inactive`.
+        default_memorized_sheet:
+          type: string
+          description: |
+            The ID of the user's default memorized timesheet.
+        dropdownthreshold:
+          type: integer
+          description: |
+            The number of items in a selection list to trigger a forced search.
+        hide:
+          type: boolean
+          description: |
+            Indicates whether the user is hidden.
+
+            Note: the User object is the only one that uses this field; other objects
+            use `is_hidden`.
+        expire_new_pw:
+          type: boolean
+          description: |
+            Whether the user's new password should expire after the first login.
+        new_pw:
+          type: string
+          description: |
+            The new password for the user.
+
+            The password must also be set in the `new_pw2` field to confirm the change.
+        new_pw2:
+          type: string
+          description: |
+            The new password for the user, repeated to confirm the change.
+
+            The password must also be set in the `new_pw` field to confirm the change.
+        roles:
+          type: array
+          description: |
+            A list of role IDs belonging to this user.
+
+            This list can be modified to change the user's roles.
+          items:
+            type: string
+            description: The internal ID of a role.
+        timerecs_in:
+          type: integer
+          description: The number of blank rows to show on the entry screen.
+          example: 3
+        time_period:
+          type: string
+          description: |
+            The "Entry Screen period" (time-span) associated with the user's Time Entry screen.
+          example: default_weekly
+        expense_period:
+          type: string
+          description: |
+            The "Entry Screen period" (time-span) associated with the user's Expense Entry screen.
+          example: default_weekly
+        custom_period:
+          type: string
+          description: |
+            The "Entry Screen period" (time-span) associated with the user's Custom Entry screen.
+          example: default_weekly
+        expense_gui:
+          type: string
+          description: |
+            The Entry Screen ID (aka GUI) of the user's Expense Entry screen.
+        time_gui:
+          type: string
+          description: The Entry Screen ID (aka GUI) of the user's Time Entry screen.
+        travel_gui:
+          type: string
+          description: The Entry Screen ID (aka GUI) of the user's Custom Entry screen.
+    ObjectStatusFields:
+      type: object
+      description: |
+        These are common fields used throughout the system to indicate the status
+        of an object, whether "hidden", "loggable", "reportable-only".
+
+        Note that "hidden" status is defined as not belonging to any
+        [Groups](/docs/reference/schemas/groupfields). See that link
+        for more information about finding hidden items.
+
+        Loggable and Reportable status means that the object is both visible
+        to at least some users, and can be used in current (new) time entries.
+
+        Reportable Only means that the object is visible to at least some users,
+        but cannot be used in newly created time entries.
+      properties:
+        is_hidden:
+          type: boolean
+          description: |
+            Indicates whether the object is hidden.
+
+            See also `status`
+          readOnly: true
+        hidden:
+          type: boolean
+          description: |
+            Indicates whether the user is hidden.
+
+            Read-only alias for `is_hidden`.
+          readOnly: true
+        status:
+          type: string
+          description: |
+            The general visibility status of the object;
+            either `Hidden`, `Loggable and Reportable`, or `Reportable Only`.
+
+            This is a write-enabled field if you have the appropriate permissions.
+            See also `status_code` which can be changed in the same way.
+          enum:
+            - Hidden
+            - Loggable and Reportable
+            - Reportable Only
+          example: Loggable and Reportable
+        status_code:
+          type: string
+          description: |
+            The internal code for the status of the object; either:
+
+            - `lr` for `Loggable and Reportable`
+            - `ro` for `Reportable Only`
+            - `h` for `Hidden`
+          enum:
+            - lr
+            - ro
+            - h
+          example: lr
+    CustomFields:
+      type: object
+      description: |
+        Custom fields are used to store additional information about a resource.
+        The fields are defined by the system administrators and can be of various
+        data types.
+
+        This page describes the schema for custom field values as shown in
+        the response of a resource that has custom fields. There is an expanded
+        schema for the custom field definitions at their own endpoint, as
+        shown in the `id_attr_type_uri` field.
+
+        :::tip
+
+        The `custom_fields` object will only be included in the response if requested
+        in `$keys`; see details below.
+
+        :::
+
+        ### Editing Custom Fields
+
+        In general, to update Custom Field values for an object, when submitting
+        a `PUT` request to update the object, you can include the `custom_fields`
+        object in the request body. The `custom_fields` object should follow
+        the basic schema shown here, but only needs to include the `value` field
+        for each custom field you want to update. For example, this is enough
+        to update two custom fields:
+
+        ```json
+        {
+          "custom_fields": {
+            "C41B2DDA662F4EF6B730F9CB6DB04696": {
+              "value": "New Value"
+            },
+            "users_email": {
+              "value": "new_email@example.com"
+            }
+        }
+        ```
+
+        Any custom fields not included in the `custom_fields` object will not be
+        updated and will retain their current values. You can set the `null` value
+
+        ### Viewability
+
+        It's also important to note that Custom Fields are subject to
+        viewability restrictions based on the "Reportability" property set by
+        system administrators.
+
+        :::tip
+
+        Please note that access to view custom fields are automatically filtered by
+        "Reportability", a property set by admins on the custom field definition that
+        determines which User Roles are allowed to see the field. If you are not seeing
+        a custom field that you expect to see, please check with your system administrator.
+
+        :::
+
+        ### Examples
+
+        Here's an example value of `custom_fields` in a response:
+
+        ```json
+        "custom_fields": {
+          "C41B2DDA662F4EF6B730F9CB6DB04696": {
+            "attr_type": "ENUM_STRING_252",
+            "description": "Employee pay group.",
+            "id_attr_type": "C41B2DDA662F4EF6B730F9CB6DB04696",
+            "id_attr_type_uri": "/api/v1/custom_fields/C41B2DDA662F4EF6B730F9CB6DB04696",
+            "pname": "Pay Group",
+            "value": "XYZ Pay Group"
+          },
+          "users_email": {
+            "attr_type": "STRING_252",
+            "description": "Email address",
+            "id_attr_type": "users_email",
+            "id_attr_type_uri": "/api/v1/custom_fields/users_email",
+            "pname": "Email Address",
+            "value": "username@example.com"
+          }
+
+        ```
+
+        Note that there is an alternate representation available in most object types, where
+        each custom field value is a separate key in the main object (not under `custom_fields`)
+        in the following format, showing both a singular and multi-value example:
+
+        ```json
+        "users_attribs:C41B2DDA662F4EF6B730F9CB6DB04696": "XYZ Pay Group",
+        "users_attribs:users_skills": [
+          "CRM admin - advanced"
+        ]
+        ```
+
+        This follows the pattern of `users_attribs:<field_id>`, where `users_attribs` is
+        the internal table name for User custom fields. For other object types, the table
+        name will be different, e.g. `projects_attribs`. This is a read-only representation
+        for convenience and is not used for updating custom fields.
+
+        This more compact representation is always provided (unless `$keys=$base` was set).
+        However, the `custom_fields` object will only be available if `$keys=custom_fields`
+        or `$keys=$extended` was set.
+      properties:
+        custom_fields:
+          type: object
+          description: |
+            A map of custom fields. The key is the field ID and the value a description
+            of the field.
+
+            Important: this will only be included in the response if `$keys=custom_fields`
+            or `$keys=$extended` was set as a query parameter.
+
+            There is also a more compact representation available in most object types, where
+            each custom field value is a separate key in the main object (not under `custom_fields`).
+
+            See the [CustomFields](/docs/reference/schemas/customfields) schema page for
+            more information on these topics.
+          example:
+            C41B2DDA662F4EF6B730F9CB6DB04696:
+              attr_type: ENUM_STRING_252
+              description: Employee pay group.
+              id_attr_type: C41B2DDA662F4EF6B730F9CB6DB04696
+              id_attr_type_uri: /api/v1/custom_fields/C41B2DDA662F4EF6B730F9CB6DB04696
+              pname: Pay Group
+              value: XYZ Pay Group
+            users_email:
+              attr_type: STRING_252
+              description: Email address
+              id_attr_type: users_email
+              id_attr_type_uri: /api/v1/custom_fields/users_email
+              pname: Email Address
+              value: username@example.com
+    BasicCreatorFields:
+      type: object
+      properties:
+        creator:
+          type: string
+          description: |
+            The internal User ID of the user who created the object.
+          example: 64BBA147B9AC41D9978062300826C89F
+          readOnly: true
+    User:
+      type: object
+      description: |
+        A user account in the JX system.
+      allOf:
+        - $ref: '#/components/schemas/CommonFields'
+        - $ref: '#/components/schemas/UserModifiableFields'
+        - $ref: '#/components/schemas/ObjectStatusFields'
+        - $ref: '#/components/schemas/CustomFields'
+        - $ref: '#/components/schemas/CreatorFields'
+        - $ref: '#/components/schemas/CreateTimestamps'
+        - $ref: '#/components/schemas/ModifierFields'
+        - $ref: '#/components/schemas/ModifyTimestamps'
+        - $ref: '#/components/schemas/DomainFields'
+      properties:
+        daysinlist:
+          type: integer
+          description: |
+            **UNUSED FIELD** This is a legacy field that is no longer used.
+          readOnly: true
+        email:
+          type: string
+          description: |
+            The email address of the user.
+
+            **Note:** This is a read-only field. To change the user's email address, you must modify the
+            `users_attribs:users_email` field.
+          readOnly: true
+        first_name:
+          type: string
+          description: |
+            The first name of the user.
+
+            Note: read-only; set via the `fullname` field.
+          readOnly: true
+        id_user:
+          type: string
+          description: |
+            The unique internal ID of this user. (Same as `id`.)
+          readOnly: true
+          example: 5CD906A3941C463B9CC98F49DBCC25AA
+        last_name:
+          type: string
+          description: |
+            The last name of the user.
+
+            Note: read-only; set via the `fullname` field.
+          readOnly: true
+        memorized_sheet_choices:
+          type: array
+          description: |
+            A list of memorized timesheets associated with the user.
+
+            These are the choices available to set in the `default_memorized_sheet` field.
+          readOnly: true
+          items:
+            type: object
+            properties:
+              value:
+                type: string
+                description: The internal ID of the memorized timesheet.
+              text:
+                type: string
+                description: The name of the memorized timesheet.
+        reserved1:
+          type: string
+          description: |
+            **UNUSED FIELD** This is a legacy field that is no longer used.
+          readOnly: true
+        reserved2:
+          type: number
+          format: float
+          description: |
+            **UNUSED FIELD** This is a legacy field that is no longer used.
+          readOnly: true
+        reserved3:
+          type: number
+          format: float
+          description: |
+            **UNUSED FIELD** This is a legacy field that is no longer used.
+          readOnly: true
+        timerecs_out:
+          type: integer
+          description: |
+            **UNUSED FIELD** This is a legacy field that is no longer used.
+          readOnly: true
+        time_gui:
+          type: string
+          description: |
+            The ID of the user's assigned time entry screen configuration.
+        time_gui_properties:
+          type: object
+          description: |
+            Details about the user's assigned time entry screen configuration.
+          readOnly: true
+        travel_gui:
+          type: string
+          description: |
+            The ID of the user's assigned Custom Entry (a.k.a. Mileage or Travel)
+            entry screen configuration.
+        travel_gui_properties:
+          type: object
+          description: |
+            Details about the user's assigned Custom Entry (a.k.a. Mileage or Travel)
+            entry screen configuration.
+          readOnly: true
+        expense_gui:
+          type: string
+          description: |
+            The ID of the user's assigned Expense entry screen configuration.
+        expense_gui_properties:
+          type: object
+          description: |
+            Details about the user's assigned Expense entry screen configuration.
+          readOnly: true
+      additionalProperties: false
+    CreatorFields:
+      type: object
+      description: |
+        Fields related to the creation of a resource, including the creation
+        timestamp, creator user ID, and creator user name.
+
+        Note that extended information about the creator user may be included
+        in the `creator_properties` field, depending on the `$keys` requested.
+        If present, this information will follow the schema of the
+        [User](/docs/reference/schemas/user) object.
+      allOf:
+        - $ref: '#/components/schemas/BasicCreatorFields'
+      properties:
+        creator_fullname:
+          type: string
+          description: |
+            The full name of the user who created the object.
+          example: John Doe
+          readOnly: true
+        creator_properties:
+          type: object
+          readOnly: true
+          description: |
+            Extended information about the [User](/docs/reference/schemas/user) who
+            created the object.
+            This field is only included if the `$keys` parameter requests it.
+          allOf:
+            - $ref: '#/components/schemas/User'
+    BasicCreateTimestampFields:
+      type: object
+      properties:
+        create_timestamp:
+          type: number
+          format: float
+          description: The timestamp when the object was created, in Unix epoch format. This is the number of seconds since 1970-01-01T00:00:00Z.
+          readOnly: true
+          example: 1696021987.01375
+    CreateTimestamps:
+      type: object
+      description: Object creation date/time fields common to many resources.
+      allOf:
+        - $ref: '#/components/schemas/BasicCreateTimestampFields'
+      properties:
+        create_timestamp_date_long:
+          type: string
+          description: The object creation date in the "long date" format defined in the system settings.
+          example: Wednesday, March 22, 2023
+          readOnly: true
+        create_timestamp_date_short:
+          type: string
+          description: The object creation date in the "short date" format defined in the system settings.
+          example: 03/22/2023
+          readOnly: true
+        create_timestamp_datetime_long:
+          type: string
+          description: The object creation date and time in the "long date" format defined in the system settings.
+          example: Wednesday, March 22, 2023 12:18:46 CDT
+          readOnly: true
+        create_timestamp_datetime_short:
+          type: string
+          description: The object creation date and time in the "short date" format defined in the system settings.
+          example: 03/22/2023 12:18:46 CDT
+          readOnly: true
+        create_timestamp_iso:
+          type: string
+          format: date-time
+          description: The creation timestamp in ISO 8601 format.
+          example: '2023-03-22T12:18:46-05:00'
+          readOnly: true
+    BasicModifierFields:
+      type: object
+      properties:
+        modifier:
+          type: string
+          description: |
+            The internal User ID of the user who most recently
+            modified the object.
+          example: 64BBA147B9AC41D9978062300826C89F
+          readOnly: true
+    ModifierFields:
+      type: object
+      description: |
+        Fields related to the last modification of a resource, including the
+        last modified timestamp in various formats, the modifier's user ID and
+        full name. Please note that this only records the most recent
+        modification. In addition, it may not reflect modifications to child
+        resources or extended properties that are defined in other tables, such
+        as "Custom Fields". These last modifier fields are always read-only.
+
+        Note that extended information about the modifier user may be included
+        in the `modifier_properties` field, depending on the `$keys` requested.
+        If present, this information will follow the schema of the
+        [User](/docs/reference/schemas/user) object.
+      allOf:
+        - $ref: '#/components/schemas/BasicModifierFields'
+      properties:
+        modifier_fullname:
+          type: string
+          description: |
+            The full name of the user who most recently modified the object.
+          example: John Doe
+          readOnly: true
+        modifier_properties:
+          type: object
+          readOnly: true
+          description: |
+            Extended information about the [User](/docs/reference/schemas/user) who
+            last modified the object.
+            This field is only included if the `$keys` parameter requests it.
+          allOf:
+            - $ref: '#/components/schemas/User'
+    BasicModifyTimestampFields:
+      type: object
+      properties:
+        modify_timestamp:
+          type: number
+          format: float
+          description: |
+            The timestamp when the object was most recently modified, in Unix
+            epoch format.
+            This is the number of seconds since 1970-01-01T00:00:00Z.
+          readOnly: true
+          example: 1696021987.01375
+    ModifyTimestamps:
+      type: object
+      description: |
+        The last modified date/time fields common to many resources. Please note
+        that this only records the most recent modification. In addition, it may
+        not record modifications to child resources or extended properties that
+        are defined in other tables, such as "Custom Fields". These fields are
+        read-only.
+      allOf:
+        - $ref: '#/components/schemas/BasicModifyTimestampFields'
+      properties:
+        modify_timestamp_date_long:
+          type: string
+          description: |
+            The last modification date in the "long date" format defined in the
+            system settings.
+          example: Wednesday, March 22, 2023
+          readOnly: true
+        modify_timestamp_date_short:
+          type: string
+          description: |
+            The last modification date in the "short date" format defined in the
+            system settings.
+          example: 03/22/2023
+          readOnly: true
+        modify_timestamp_datetime_long:
+          type: string
+          description: |
+            The last modification date and time in the "long date" format
+            defined in the system settings.
+          example: Wednesday, March 22, 2023 12:18:46 CDT
+          readOnly: true
+        modify_timestamp_datetime_short:
+          type: string
+          description: |
+            The last modification date and time in the "short date" format
+            defined in the system settings.
+          example: 03/22/2023 12:18:46 CDT
+          readOnly: true
+        modify_timestamp_iso:
+          type: string
+          format: date-time
+          description: The last modification timestamp in ISO 8601 format.
+          example: '2023-03-22T12:18:46-05:00'
+          readOnly: true
+    DomainFields:
+      type: object
+      description: |
+        These are fields related to the deprecated "Domain" object.
+      properties:
+        id_domain:
+          type: string
+          description: |
+            The internal Domain ID of the resource or object.
+            In general, this field is deprecated and not in use and can be ignored.
+          example: install_root_dom
+          readOnly: true
+    UserCollectionResponse:
+      allOf:
+        - $ref: '#/components/schemas/PagedResponse'
+        - type: object
+          properties:
+            results:
+              type: array
+              description: |
+                A user account in the JX system.
+              items:
+                $ref: '#/components/schemas/User'
+    ErrorResponse:
+      description: |
+        A standard format for error responses that may be returned by the API when various
+        types of errors occur, including authentication (sign-in) failures, authorization
+        (permission) failures, "object not found" (404), internal server errors (500),
+        bad client requests (400) and other types of errors.
+      type: object
+      properties:
+        error:
+          type: object
+          description: |
+            A detailed error object that includes a code and message for the error
+            that occurred. This is useful for client applications to display to
+            users or to log for debugging purposes.
+          properties:
+            code:
+              type: string
+              description: |
+                A short code that identifies the type of error that occurred.
+                This helps group related errors into categories for common
+                treatment in the user interface or client program.
+
+                Some of the common codes are listed on the
+                [Core Concepts#Fixed error codes](/docs/rest-overview#fixed-error-codes)
+                page.
+              example: NotFoundOrNotAuthorized
+            message:
+              type: string
+              description: |
+                A human-readable message that describes the error that occurred.
+              example: You must be signed in to access this resource. If you are making an API call, please check the section of the documentation on authentication.
+        errors:
+          type: array
+          description: |
+            An array of error messages that may be returned by the server. Usually
+            this has the same content as the `error` object's `message` field, but
+            this array may contain additional messages or details.
+          items:
+            type: string
+            example: You must be signed in to access this resource. If you are making an API call, please check the section of the documentation on authentication.
+        response_code:
+          type: integer
+          description: |
+            The HTTP status code of the response. This is useful for client
+            applications to determine the type of error that occurred.
+          example: 401
+        success:
+          type: boolean
+          description: |
+            Indicates whether the request was successful (normally false if it's an
+            error response)
+          default: false
+        traceback:
+          type: string
+          description: |
+            A full traceback of the error that occurred on the server. This is
+            useful for debugging and troubleshooting. Note that the traceback is
+            only available if the server is in development mode.
+          example: |
+            Traceback (most recent call last): ... (full traceback)
+    CreateItemResponse:
+      description: |
+        The item was successfully created.
+
+        This is a minimal response that indicates whether the request was successful and provides the
+        URI of the created item. To retrieve additional details or the full item, you may need to make
+        additional requests.
+
+        :::info
+
+        See the `Location` header for the URL of the new item,
+        as well as the `X-Item-Id` and `X-Item-Table` headers for the ID and
+        table name of the new item.
+
+        :::
+      type: object
+      properties:
+        response_code:
+          type: integer
+          description: The response code.
+          example: 201
+        success:
+          type: boolean
+          description: Indicates whether the request was successful.
+          example: true
+        uri:
+          type: string
+          format: uri
+          description: The URI of the created item.
+          example: https://example.apps.journyx.com/api/v1/users/123
+    ItemResponse:
+      description: |
+        A standard success response includes a single item (object), and other metadata.
+      type: object
+      properties:
+        response_code:
+          type: integer
+          description: HTTP status code of the response for reference purposes.
+          example: 200
+          default: 200
+        results:
+          type: object
+        success:
+          type: boolean
+          description: |
+            Indicates whether the request was successful (normally true if it's not
+            an error response)
+          default: true
+        uri:
+          type: string
+          description: URL of the current request / resource, for reference purposes.
+          example: https://example.apps.journyx.com/api/v1/users
+    UserItemResponse:
+      allOf:
+        - $ref: '#/components/schemas/ItemResponse'
+        - type: object
+          properties:
+            results:
+              $ref: '#/components/schemas/User'
+  responses:
+    BadRequest:
+      description: |
+        A `400 Bad Request` is returned when the client request was malformed,
+        invalid, or otherwise could not be processed as-is. Usually, the cause for
+        the error is included in the `error.message` field of the response, and the
+        client should correct the request and try again.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotAuthenticated:
+      description: |
+        Not authenticated - you must be signed in to access this resource. Please
+        check the section of the documentation on authentication.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotAuthorized:
+      description: |
+        A `403 Forbidden` response means that you are not authorized to perform
+        this action or access this object, or the object does not exist at all.
+
+        The client request may have been valid but the client does not have
+        permission to access the requested resource or perform the requested action.
+
+        :::tip 403 Forbidden also used when objects don't exist
+
+        In most cases, the system will not return a `404 Not Found` error response;
+        it returns `403 Forbidden` both when the object doesn't exist at all,
+        and also when it exists but the client does not have permission to access it.
+        This is a security measure to prevent unauthorized users from determining
+        whether an object exists or not.
+
+        :::
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFound:
+      description: |
+        Not found - the requested resource could not be found or does not exist.
+        This may also include cases where the resource does exist, but the client
+        does not have permission to access that resource.
+
+        :::tip 403 Forbidden also used when objects don't exist
+
+        In most cases, the system will not return a `404 Not Found` error response;
+        it returns `403 Forbidden` both when the object doesn't exist at all,
+        and also when it exists but the client does not have permission to access it.
+        This is a security measure to prevent unauthorized users from determining
+        whether an object exists or not.
+
+        :::
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    InternalServerError:
+      description: |
+        Internal server error; an unexpected error occurred on the server. This
+        could be due to a temporary condition or might be the result of a bug in the
+        server software. Also, in some cases, an incorrect client input can
+        trigger this error, and can be resolved by correcting the input.
+
+        If the error persists, please contact support along along with the following
+        details when possible:
+
+        - any error messages received from the server
+        - the full request and response details (full headers and body)
+        - a description of the steps that led to the error
+        - the time range when it occurred.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    ServiceUnavailable:
+      description: |
+        Service unavailable - the server is currently unable to handle the request,
+        usually due to maintenance activity on the server. Check if the server's web
+        interface is currently available, or try again later.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'

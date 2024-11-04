@@ -1,0 +1,60 @@
+components:
+  schemas:
+    ObjectStatusFields:
+      type: object
+      # TODO: need a better link for "Groups" as a concept below
+      description: |
+        These are common fields used throughout the system to indicate the status
+        of an object, whether "hidden", "loggable", "reportable-only".
+
+        Note that "hidden" status is defined as not belonging to any
+        [Groups](/docs/reference/schemas/groupfields). See that link
+        for more information about finding hidden items.
+
+        Loggable and Reportable status means that the object is both visible
+        to at least some users, and can be used in current (new) time entries.
+
+        Reportable Only means that the object is visible to at least some users,
+        but cannot be used in newly created time entries.
+      properties:
+        is_hidden:
+          type: boolean
+          description: |
+            Indicates whether the object is hidden.
+
+            See also `status`
+          readOnly: true
+        hidden:
+          type: boolean
+          description: |
+            Indicates whether the user is hidden.
+
+            Read-only alias for `is_hidden`.
+          readOnly: true
+        status:
+          type: string
+          description: |
+            The general visibility status of the object;
+            either `Hidden`, `Loggable and Reportable`, or `Reportable Only`.
+
+            This is a write-enabled field if you have the appropriate permissions.
+            See also `status_code` which can be changed in the same way.
+          enum:
+            - Hidden
+            - Loggable and Reportable
+            - Reportable Only
+          example: Loggable and Reportable
+
+        status_code:
+          type: string
+          description: |
+            The internal code for the status of the object; either:
+
+            - `lr` for `Loggable and Reportable`
+            - `ro` for `Reportable Only`
+            - `h` for `Hidden`
+          enum:
+            - lr
+            - ro
+            - h
+          example: lr

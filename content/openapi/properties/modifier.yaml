@@ -1,0 +1,51 @@
+components:
+  schemas:
+    BasicModifierFields:
+      type: object
+      properties:
+        modifier:
+          type: string
+          description: |
+            The internal User ID of the user who most recently
+            modified the object.
+          example: 64BBA147B9AC41D9978062300826C89F
+          readOnly: true
+
+    ModifierFields:
+      type: object
+      description: |
+        Fields related to the last modification of a resource, including the
+        last modified timestamp in various formats, the modifier's user ID and
+        full name. Please note that this only records the most recent
+        modification. In addition, it may not reflect modifications to child
+        resources or extended properties that are defined in other tables, such
+        as "Custom Fields". These last modifier fields are always read-only.
+
+        Note that extended information about the modifier user may be included
+        in the `modifier_properties` field, depending on the `$keys` requested.
+        If present, this information will follow the schema of the
+        [User](/docs/reference/schemas/user) object.
+      allOf:
+        - $ref: "#/components/schemas/BasicModifierFields"
+      properties:
+        modifier_fullname:
+          type: string
+          description: |
+            The full name of the user who most recently modified the object.
+          example: John Doe
+          readOnly: true
+        # https://stackoverflow.com/a/48114924
+        # This is how we can attach properties like nullable and a custom description
+        # while still using a `$ref` under OpenAPI 3.0.  It appears to be a bit different
+        # under OpenAPI 3.1 which our current toolset doesn't seem to support yet anyway.
+        # https://github.com/OAI/OpenAPI-Specification/issues/1368
+        # TODO: that wasn't really working, had to remove nullable here.
+        modifier_properties:
+          type: object
+          readOnly: true
+          description: |
+            Extended information about the [User](/docs/reference/schemas/user) who
+            last modified the object.
+            This field is only included if the `$keys` parameter requests it.
+          allOf:
+            - $ref: "../collections/users/user.yaml#/User"

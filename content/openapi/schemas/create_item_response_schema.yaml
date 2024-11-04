@@ -1,0 +1,31 @@
+CreateItemResponse:
+  description: |
+    The item was successfully created.
+
+    This is a minimal response that indicates whether the request was successful and provides the
+    URI of the created item. To retrieve additional details or the full item, you may need to make
+    additional requests.
+
+    :::info
+
+    See the `Location` header for the URL of the new item,
+    as well as the `X-Item-Id` and `X-Item-Table` headers for the ID and
+    table name of the new item.
+
+    :::
+
+  type: object
+  properties:
+    response_code:
+      type: integer
+      description: The response code.
+      example: 201
+    success:
+      type: boolean
+      description: Indicates whether the request was successful.
+      example: true
+    uri:
+      type: string
+      format: uri
+      description: The URI of the created item.
+      example: https://example.apps.journyx.com/api/v1/users/123

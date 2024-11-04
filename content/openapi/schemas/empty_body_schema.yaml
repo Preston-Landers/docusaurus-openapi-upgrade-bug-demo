@@ -1,0 +1,19 @@
+# You can use this when a request does not require a request body.
+# Use it like as follows:
+#
+# requestBody:
+#   description:
+#     $ref: "../../schemas/empty_body_schema.yaml#/components/schemas/EmptyRequestBody/description"
+#   content:
+#     application/json:
+#       schema:
+#         $ref: "../../schemas/empty_body_schema.yaml#/components/schemas/EmptyRequestBody"
+
+components:
+  schemas:
+    EmptyRequestBody:
+      type: object
+      nullable: true
+      description: |
+        You do not need to provide a request body for this operation.
+      properties: {}

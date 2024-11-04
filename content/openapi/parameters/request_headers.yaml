@@ -1,0 +1,70 @@
+# These are headers that are common to most types of API requests.
+components:
+  parameters:
+    XRequestedWithHeader:
+      name: X-Requested-With
+      in: header
+      required: true
+      schema:
+        type: string
+      description: |
+        The X-Requested-With header is required for all `POST`, `PUT`, and `DELETE` requests.
+        This is an [anti-CSRF](https://en.wikipedia.org/wiki/Cross-site_request_forgery)
+        measure.
+
+        The value should be `XMLHttpRequest`.
+      example: XMLHttpRequest
+    OriginHeader:
+      name: Origin
+      in: header
+      required: true
+      schema:
+        type: string
+      description: |
+        The `Origin` header is required for all `POST`, `PUT`, and `DELETE` requests.
+        This is an [anti-CSRF](https://en.wikipedia.org/wiki/Cross-site_request_forgery)
+        measure.
+
+        The value should be the base URL of the service you are calling.
+
+        The `Referer` header can also be used in place of `Origin`.
+        Please note the unusual spelling of `Referer`.
+
+      example: "https://example.apps.journyx.com"
+    ContentTypeHeader:
+      name: Content-Type
+      in: header
+      required: true
+      schema:
+        type: string
+      description: |
+        The Content-Type header is required for all `POST` or `PUT` requests
+        that have a request body.
+
+        The value should normally be `application/json` assuming
+        you are sending [JSON data](https://en.wikipedia.org/wiki/JSON).
+      example: application/json
+    IfMatchHeader:
+      name: If-Match
+      in: header
+      required: true
+      schema:
+        type: string
+      description: |
+        The `If-Match` header is *required* for all `PUT` requests that modify
+        objects. The value should be the current ETag value of the object you
+        are modifying, which can be obtained from the `ETag` header of the
+        object's `GET` response. This is to ensure you are not accidentally
+        overwriting changes made by another client.
+      example: 333c3873b9a60...
+    AcceptHeader:
+      name: Accept
+      in: header
+      required: true
+      schema:
+        type: string
+      description: |
+        The Accept header is required for all `GET` requests that expect a
+        response body. The value should normally be `application/json` assuming
+        you are expecting JSON data.
+      example: application/json
