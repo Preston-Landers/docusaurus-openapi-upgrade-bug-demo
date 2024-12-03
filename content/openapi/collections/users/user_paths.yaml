@@ -184,11 +184,11 @@ user-item:
       Update (modify) a user record by their internal ID. This will update the
       user record with the new data provided in the request body.
 
-      # START_RAW
+      <blink>Blinking!</blink>
+
       import PutHeaders from '@site/content/partials/_put-headers.mdx'
 
       <PutHeaders />
-      # END_RAW
 
       :::info Required abilities
 

@@ -49,7 +49,6 @@ const config: Config = {
           sidebarPath: "./sidebars.ts",
 
           docItemComponent: "@theme/ApiItem", // Derived from docusaurus-theme-openapi
-
         },
         theme: {
           customCss: "./src/css/custom.css",
@@ -181,8 +180,7 @@ const config: Config = {
         },
         {
           title: "More",
-          items: [
-          ],
+          items: [],
         },
       ],
       copyright: `Copyright © ${new Date().getFullYear()} Journyx, Inc. Built with Docusaurus and Redocly.`,

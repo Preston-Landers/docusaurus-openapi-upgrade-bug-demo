@@ -4,6 +4,8 @@
 # Production
 /build
 
+content/docs/reference
+
 /tmp
 
 # PyCharm / JetBrains / IDEA - May eventually change this

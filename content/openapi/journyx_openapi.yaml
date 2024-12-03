@@ -41,7 +41,6 @@ components:
         Authentication is described in more detail in the dedicated
         Authentication section of the documentation.
 
-
       type: apiKey
       in: cookie
       name: wtsession
