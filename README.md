@@ -40,12 +40,17 @@ Error: MDX compilation failed for file "/Users/planders/src/journyx/docusaurus-o
 Cause: Unexpected character `&` (U+0026) in name, expected a name character such as letters, digits, `$`, or `_`; whitespace before attributes; or the end of the tag
 ```
 
+(Note: I don't actually need the blink tag, which doesn't do anything, but it
+was just an example of a "custom" HTML element.)
+
 In issue #993, I
 [mentioned](https://github.com/PaloAltoNetworks/docusaurus-openapi-docs/issues/993#issuecomment-2448155915)
 that I had a workaround of having a special post-processing step run a script
 that looks for an un-escaped `RAW` blocks.
 
-That solution still works for this use case and is demonstrated in this branch.
+That solution still works for this use case and is demonstrated in this branch
+in the `scripts/fix-openapi-mdx-blocks.mjs` file, which is run as part of the
+`yarn build` step.
 
 ## Issue 1012
 
